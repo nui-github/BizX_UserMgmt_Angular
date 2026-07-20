@@ -4,6 +4,12 @@
   display: flex;
 }
 
+// Collapsed sidebar: swap the full wordmark for the square favicon so it still fits the icon rail.
+:host-context(body[data-sidebartype="mini-sidebar"]) .app-logo {
+  content: url("/assets/images/Favicon-BizX.png") !important;
+  width: 32px !important;
+}
+
 .app-name {
   font-size: 18px;
 }
