@@ -1,0 +1,149 @@
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputCompanyConfig">
+</app-standard-form-card>
+<!-- <form nz-form [formGroup] = "formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'" >
+  <div nz-row [nzGutter]="16" >
+    <div nz-col [nzSpan]="12">
+      <nz-form-item>
+        <nz-form-item>
+        </nz-form-item>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="12" >
+      <nz-form-item >
+        <nz-form-control >
+                  <div class="form-group form-check mb-0">
+                    <input
+                      [disabled]="ReadOnlyStyleGuideNotes"
+                      #unlimitUserChecked
+                      type="checkbox"
+                      class="form-check-input card-control-value"
+                      id="gmnc-limit-user-checked"
+                      [checked]="formGroup.controls['limitUser'].value == -1"
+                      (change)="changeUserLimit(unlimitUserChecked.checked)"
+                    />
+                    <label class="form-label" for="gmnc-limit-user-checked"
+                      >Unlimited Users</label
+                    >
+                  </div>
+                  @if (formGroup.controls['limitUser'] &&
+                  formGroup.controls['limitUser'].errors &&
+                  (formGroup.controls['limitUser'].dirty ||
+                  formGroup.controls['limitUser'].touched)) {
+                  <app-standard-error-message
+                    class="invalid-tooltip"
+                    [control]="formGroup.controls['limitUser']"
+                    [fieldName]="'Limit Users'"
+                    [messages]=""
+                  ></app-standard-error-message>
+                  }
+
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+
+  </div>
+</form> -->
+<!-- <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [inputConfig]="inputApproveConfig">
+</app-standard-form-card> -->
+@if(formGroup.controls['cpid'].value){
+  <form nz-form autocomplete="off" novalidate [nzLayout]="'vertical'" >
+    <div nz-row [nzGutter]="16" >
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item >
+          <nz-form-label nzFor="gmn-roles">
+            <span>
+              {{ roleLabel | translate }}
+            </span>
+          </nz-form-label>
+          <nz-form-control >
+                    <div class="form-group form-check mb-0">
+                      <ng-container *ngIf="!isLoading; else loading">
+                        @for(role of this.formGroup.controls.roles.controls; track $index){
+                        <div id="gmnc-role-user" class="form-check" >
+                          <input title="Roles {{roles[$index].name}}" *ngIf="this.hasPermissions" class="form-check-input"
+                          [formControl]="role" type="checkbox" id="gmnc-role-check-{{$index}}" (click)="isSelected = true" (change)="eventOnChangeRole()">
+                          <input title="Roles {{roles[$index].name}}" *ngIf="!this.hasPermissions" class="form-check-input"
+                          [formControl]="role" type="checkbox" id="gmnc-role-check-{{$index}}">
+                          <label class="form-label" for="gmnc-role-check-{{$index}}">
+                            {{roles[$index].name}}
+                          </label>
+                        </div>
+
+                        }
+                        @if(formGroup.getRawValue().roles.filter(checkRoleSelected).length === 0 && isSelected && roles.length > 0){
+                          <div class="role-error">
+                          <span class="role-error-text">
+                            @if(getLang() == 'en'){
+                              {{ roleLabel | translate }} {{ i18n.validation.required  | translate }}
+                            }@else {
+                              {{ i18n.validation.required  | translate }} {{ roleLabel | translate }}
+                            }
+
+                          </span>
+                        </div>
+                        }
+                        @if(roles.length == 0){
+                          <div class="role-error">
+                            <span class="role-error-text">
+                              @if(getLang() == 'en'){
+                                {{ roleLabel | translate }} {{ roleNotFound  | translate }} {{ roleNotFoundAdd  | translate }} {{ roleNotFoundCompany  | translate }}  {{ roleNotFoundTag  | translate }}
+                              }@else {
+                                {{ roleNotFound  | translate }} {{ roleLabel | translate }} {{ roleNotFoundAdd  | translate }}{{ roleLabel | translate }}{{ roleNotFoundOf  | translate }}{{ roleNotFoundCompany  | translate }}
+                              }
+                            </span>
+                          </div>
+                        }
+                      </ng-container>
+                      <ng-template #loading>
+                      </ng-template>
+                    </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="gmn-roles">
+            <span>
+              {{ menuLabel | translate }}
+            </span>
+          </nz-form-label>
+          <nz-form-control>
+            <ul id="group-menu">
+              <div class="form-group form-check">
+              @for(menu of roleMenus; track $index){
+                <div id="gmnc-group-menu-{{menu.id}}" class="form-check">
+                  <input class="form-check-input" type="checkbox" id="gmnc-group-menucheck-{{menu.id}}" disabled="true" [checked]="true">
+                  <label class="form-label" for="gmnc-group-menucheck-{{menu.id}}">{{menu.name}}</label>
+                </div>
+                <ul id="group-menu">
+                  @for (subMenu of menu.subMenu; track $index) {
+                    <div id="gmnc-group-submenu-{{subMenu.id}}" class="form-check sub-menu-margin">
+                      <input class="form-check-input" type="checkbox" id="gmnc-group-submenucheck-{{subMenu.id}}" disabled="true" [checked]="true">
+                      <label class="form-label" for="gmnc-group-submenucheck-{{subMenu.id}}">{{subMenu.name}}</label>
+                    </div>
+                  }
+              </ul>
+              }
+              </div>
+            </ul>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+}
+<div class="d-flex flex-wrap gap-6 align-items-center">
+  <div>
+    <div class="text-center">
+      @if (hasPermissions) {
+      <button title="{{i18n.buttons.save | translate}}" type="button" id="gmnc-save-btn"  class="btn btn-primary" (click)="save()">
+        {{i18n.buttons.save | translate}}
+      </button>
+      } &nbsp;
+      <button title="{{i18n.buttons.cancel | translate}}" type="button"  id="gmnc-cancel-btn" class="btn btn-danger ms-6"
+        (click)="onClosed()">
+        {{i18n.buttons.cancel | translate}}
+      </button>
+    </div>
+  </div>
+</div>

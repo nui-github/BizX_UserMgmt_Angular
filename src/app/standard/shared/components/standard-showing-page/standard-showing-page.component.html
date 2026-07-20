@@ -1,0 +1,15 @@
+<div class="d-flex justify-content-between align-items-center">
+<label class="my-1 mr-2 text-pagination-limit" for="showing-page">{{ i18n.showingPage.showPage | translate }}&nbsp;</label>
+<!-- <select [(ngModel)]="pageSizeConfig" (ngModelChange)="paginationOnChangeSize($event)"
+  [ngModelOptions]="{standalone: true}" class="form-control form-control-md my-1 mr-2 force-bg-light">
+  <option selected value="10">10</option>
+  <option value="25">25</option>
+  <option value="50">50</option>
+  <option value="100">100</option>
+</select> -->
+<nz-select [(ngModel)]="pageSizeConfig" (ngModelChange)="paginationOnChangeSize($event)"
+  [nzAllowClear]="false" class="form-control form-control-md force-bg-light">
+  <nz-option *ngFor="let size of pageSizes" [nzLabel]="size" [nzValue]="size"></nz-option>
+</nz-select>
+<span class="text-pagination-limit">  {{ i18n.showingPage.showEntries | translate }}</span>
+</div>

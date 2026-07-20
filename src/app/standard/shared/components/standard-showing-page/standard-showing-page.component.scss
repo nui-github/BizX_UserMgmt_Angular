@@ -1,0 +1,34 @@
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.form-inline .form-check {
+  width: 100%;
+}
+
+.text-pagination-limit {
+  color: #8c8b89;
+}
+.form-control-size{
+  height: calc(1.5em + 0.75rem + calc(1px * 2)) !important;
+  // line-height: 1.5 !important;
+  min-height: calc(1.5em + 0.75rem + calc(1px * 2)) !important;
+  // min-height: calc(1.5em + 1rem + calc(var(--bs-border-width) * 2));
+  // line-height: 1.5 !important;
+}
+nz-select {
+  margin-right: 0.5em;
+  margin-left: 0.5em;
+  width: 70px;
+}
+
+.nz-option{
+  color: #8c8b89 !important;
+}
+
+::ng-deep .ant-select-selection-item {
+  color: #8c8b89 !important;
+  padding-top: 0.15em !important;
+}

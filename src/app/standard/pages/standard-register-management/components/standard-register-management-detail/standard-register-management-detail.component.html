@@ -1,0 +1,150 @@
+<div nz-col [nzSpan]="24" class="section-title">
+  {{informationTitle}}
+</div>
+@if(this.formGroup.controls.registerType !== null && this.formGroup.controls.registerType.value == 1){
+  <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputInformationConfig">
+  </app-standard-form-card>
+}
+@else {
+  <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputPersonalInformationConfig">
+  </app-standard-form-card>
+}
+<div nz-col [nzSpan]="24" class="section-title">
+  {{addressTitle}}
+</div>
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputAddressInformationConfig">
+</app-standard-form-card>
+<form nz-form  [formGroup]="formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'">
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="24" [nzMd]="12">
+      <nz-form-item>
+        <nz-form-label nzFor="reg-com-company-street">
+          <span>
+            {{streetLabel | translate}}
+            <br>
+            <span class="form-label-small">{{streetSubLabel | translate}}</span>
+          </span>
+        </nz-form-label>
+        <nz-form-control>
+          <input type="text" class="form-control" id="reg-com-company-street" name="reg-com-company-street" placeholder="Please fill in"
+            formControlName="street"/>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div nz-col [nzSpan]="24" [nzMd]="12">
+      <nz-form-item>
+        <nz-form-control>
+          <app-standard-subdistrict
+                    label="pages.register.management.detail.address.information.input.subDistrict.label"
+                    subLabel="pages.register.management.detail.address.information.input.subDistrict.sublabel"
+                    [control]="formGroup.controls['subDistrictName']"
+                    [isSubmit]="isSubmit" [isCreated]="isCreated"
+                    [input]="subDistrictTypeaheadBase"
+                    (onSelectChanged)="subDistrictChange($event)"
+                  ></app-standard-subdistrict>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+</form>
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputAddressInformation2Config">
+</app-standard-form-card>
+<div nz-col [nzSpan]="24" class="section-title">
+  {{contactTitle}}
+</div>
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputContactInformationConfig">
+</app-standard-form-card>
+@if(configuration.REGISTER_ATTACHMENT == 1 && document.length > 0){
+<div nz-col [nzSpan]="24" class="section-title">
+  {{i18n.pageStandardTitle.attachmentDocTitle | translate}}
+</div>
+  <div nz-col [nzSpan]="24">
+    <table id="rmnl-items-list" class="table table-rows mb-0 footable">
+      <thead>
+        <tr class="footable-header">
+          <th scope="col" class="text-center" width="10%">#</th>
+          <th scope="col">{{i18n.pageStandardTitle.docTypeTitle | translate}}</th>
+          <th scope="col" width="10%" class="text-center">{{i18n.pageStandardTitle.actionTitle | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="!isLoading;">
+          <tr *ngFor="let item of document; index as i">
+            <td class="text-center">{{i+1}}</td>
+            <td>{{item.nameTh}}</td>
+            <td class="text-nowrap text-center">
+              <a id="rmnl-items-view-{{i}}" class="btn text-secondary btn-sm p-0 m-1 btn-document" (click)="processView(item.code)"
+                placement="left" tooltip="View">
+                <i class="ti ti-search"></i>
+              </a>
+            </td>
+          </tr>
+          <tr *ngIf="document.length == 0">
+            <td class="text-center" colspan="3">
+              {{i18n.fields.emptyData | translate}}
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+</div>
+}
+<div nz-col [nzSpan]="24" class="section-title">
+  {{i18n.pageStandardTitle.userTitle | translate}}
+</div>
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputUserInformationConfig">
+</app-standard-form-card>
+<div nz-col [nzSpan]="24" class="section-title">
+  {{i18n.pageStandardTitle.loginTitle | translate}}
+</div>
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputLoginInformationConfig">
+</app-standard-form-card>
+<div nz-col [nzSpan]="24" class="section-title">
+  {{i18n.pageStandardTitle.additionalTitle | translate}}
+</div>
+<form nz-form [formGroup]="formGroup"  autocomplete="off" novalidate [nzLayout]="'vertical'">
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="24">
+      <nz-form-item>
+        <nz-form-label nzFor="cmn-reject-reason">
+          <span>
+            {{rejectLabel | translate}}
+            <br>
+            <span class="form-label-small">{{rejectSubLabel | translate}}</span>
+          </span>
+        </nz-form-label>
+        <nz-form-control>
+          <textarea class="form-control"  id="cmnc-company-reject-reason" formControlName="rejectReason"></textarea>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+</form>
+<div class="d-flex flex-wrap gap-6 align-items-center">
+  <div>
+    <div class="text-center">
+          <button
+            type="button"
+            id="cmnc-back-btn"
+            class="btn btn-outline-primary ms-6"
+            aria-expanded="false"
+            (click)="onClosed()"
+          >
+            <i class="ti ti-chevron-left"></i>
+            {{i18n.buttons.back | translate}}
+          </button>
+    </div>
+    <div class="form-row align-items-center float-right">
+      <button title="{{i18n.buttons.approve | translate}}" *ngIf=" permissionApprove && formGroup.controls['status'].value == 1" id="cmnc-approve-btn" type="button" [disabled]="isLoading" (click)="processApprove()"
+        class="btn btn-sm btn-light m-1">
+        <i class="fa fa-check text-info"></i>
+        {{i18n.buttons.approve | translate}}
+      </button>
+      <button title="{{i18n.buttons.reject | translate}}" *ngIf="permissionReject && formGroup.controls['status'].value == 1" id="cmnc-reject-btn" type="button" [disabled]="isLoading" (click)="processReject()"
+        class="btn btn-sm btn-light m-1">
+        <i class="fa fa-times text-danger"></i>
+        {{i18n.buttons.reject | translate}}
+      </button>
+    </div>
+  </div>
+</div>

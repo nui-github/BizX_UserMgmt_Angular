@@ -1,0 +1,21 @@
+<app-standard-card cardTile="pages.regsiter.input.title" cardSubtile="pages.regsiter.input.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['REGISTER_ADD'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/register/approve/create']"
+      id="rmnl-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-register-management-detail></app-standard-register-management-detail>
+    }
+    @else {
+      <app-standard-register-management-list></app-standard-register-management-list>
+    }
+  </ng-template>
+
+</app-standard-card>

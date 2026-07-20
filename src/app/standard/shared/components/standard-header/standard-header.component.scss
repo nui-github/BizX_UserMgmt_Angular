@@ -1,0 +1,62 @@
+.simplebar-content-wrapper {
+  overflow: scroll !important;
+  min-height: auto !important;
+  max-height: max-content !important;
+}
+
+.btn {
+  width: auto !important;
+}
+
+.message-body {
+  i {
+    font-size: 24px;
+  }
+}
+
+/* In your component's CSS file */
+#profileImage {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background: #f1bada;
+  font-size: 20px;
+  color: #000000;
+  text-align: center;
+  flex: auto;
+  align-items: center;
+  // line-height: 150px;
+  // margin: 20px 0;
+}
+
+.lang-select {
+  color: #ffffff;
+  background-color: #4a6ccc;
+}
+.simplebar-offset{
+  right: 0px !important; 
+  bottom: 0px !important; 
+}
+
+.margin-n-16{
+  margin: -16px;
+}
+
+.simplebar-placeholder{
+  width: 0px; 
+  height: 0px;
+}
+
+.simplebar-scrollbar-veritcal{
+  height: 0px; 
+  display: none;
+}
+
+.simplebar-scrollbar-horizontal{
+  width: 0px; 
+  display: none;
+}
+
+.simplebar-track{
+  visibility: hidden;
+}

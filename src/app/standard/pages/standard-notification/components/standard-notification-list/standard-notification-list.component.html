@@ -1,0 +1,23 @@
+<div *ngIf="totalItems === 0">
+    <label>No data.</label>
+</div>
+<div>
+    <cdk-virtual-scroll-viewport itemSize="{{totalItems}}" class="notification-container">
+      <nz-list>
+        <nz-list-item *cdkVirtualFor="let notification of notifications">
+          @if (notification) {
+            <nz-list-item-meta
+              nzAvatar="{{notification.isRead ? './assets/images/standard/dot-white.png' : './assets/images/standard/dot.png'}}"
+              [nzDescription]="notification.subject"
+            >
+              <nz-list-item-meta-title>
+                <a href="javascript:void(0)" class="d-flex align-items-center dropdown-item" (click)="eventOnClickNotification(notification)">{{ notification.detail }}</a>
+              </nz-list-item-meta-title>
+            </nz-list-item-meta>
+          } @else {
+            <nz-skeleton [nzAvatar]="true" [nzParagraph]="{ rows: 1 }"></nz-skeleton>
+          }
+        </nz-list-item>
+      </nz-list>
+    </cdk-virtual-scroll-viewport>
+</div>

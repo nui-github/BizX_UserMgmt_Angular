@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.permission.title" cardSubtile="pages.permission.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['PERMISSION_CREATE'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/permission/add']"
+        id="perm-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-permission-detail></app-standard-permission-detail>
+    } @else {
+      <app-standard-permission-list></app-standard-permission-list>
+    }
+  </ng-template>
+
+</app-standard-card>

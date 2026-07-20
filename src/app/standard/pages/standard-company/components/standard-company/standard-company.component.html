@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.company.input.title" cardSubtile="pages.company.input.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['COMPANY_CREATE'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/company/add']"
+      id="cmnl-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-company-detail></app-standard-company-detail>
+    } @else {
+      <app-standard-company-list></app-standard-company-list>
+    }
+  </ng-template>
+
+</app-standard-card>

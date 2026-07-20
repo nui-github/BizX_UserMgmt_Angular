@@ -1,0 +1,70 @@
+// .form-control {
+//     padding-top: calc(0.375rem + 1px);
+//     /* background: #FFFFFF !important; */
+//     border: 1px solid #A7A7A7 !important;
+//     border-radius: 5px !important;
+//     color: #424242 !important;
+//     height: 38px !important;
+// }
+
+.dropdown-menu {
+    // inset: 100% 15px auto 15px !important;
+    overflow: none !important;
+}
+
+// .ngx-select__selected {
+//     padding-top: calc(0.375rem + 1px);
+//     border: 1px solid #A7A7A7 !important;
+//     border-radius: 5px !important;
+//     color: inherit !important;
+//     background-color: inherit !important;
+//     // min-width: auto !important;
+
+// }
+
+
+ .ngx-select__toggle {
+    background-color: inherit !important;
+    color: inherit !important;
+    height: auto !important;
+    min-width: 100% !important;
+    outline: 0;
+    position: relative;
+    text-align: left !important;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+    display: inline-flex;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+// ::ng-deep .ngx-select__search {
+//     color: #000000 !important;
+// }
+
+// ::ng-deep .ngx-select__choices a {
+//     height: 40px !important;
+//     padding-top: 0.5rem !important;
+//     border-bottom: 0.5px solid rgb(231, 230, 230) !important;
+// }
+
+// ::ng-deep .ngx-select__choices a:hover {
+//     color: #000000 !important;
+// }
+
+.ngx-select__clear.btn.btn-link {
+    width: 15px;
+}
+
+.invalid-tooltip {
+    display: block;
+    max-width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.1rem;
+    font-size: .875rem;
+    line-height: 1;
+    color: #fff;
+    background-color: rgba(220, 53, 69, 0.8);
+    border-radius: 0.2rem;
+}

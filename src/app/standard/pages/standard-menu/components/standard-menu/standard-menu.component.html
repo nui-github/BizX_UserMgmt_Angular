@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.menu.title" cardSubtile="pages.menu.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['MENU_CREATE'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/menu/add']"
+        id="mmnl-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-menu-detail></app-standard-menu-detail>
+    } @else {
+      <app-standard-menu-list></app-standard-menu-list>
+    }
+  </ng-template>
+
+</app-standard-card>

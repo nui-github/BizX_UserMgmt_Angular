@@ -1,0 +1,22 @@
+<!-- form-example.component.html -->
+<app-standard-form-card cardTile="pages.permission.title" cardSubtile="pages.permission.subtitle"
+  [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [inputConfig]="inputConfig">
+
+  <ng-template #submitTemplate>
+    <div class="d-flex flex-wrap gap-6 align-items-center">
+      <div>
+        <div class="text-center">
+          <button title="{{i18n.buttons.save | translate}}" *ngIf="hasPermissions" type="button" id="umnc-save-btn" class="btn btn-primary"
+            (click)="onSave()">
+            {{i18n.buttons.save | translate}}
+          </button>
+          <button title="{{i18n.buttons.back |translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
+            (click)="onClosed()">
+            {{i18n.buttons.back | translate}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+</app-standard-form-card>

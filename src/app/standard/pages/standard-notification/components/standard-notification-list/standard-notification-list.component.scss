@@ -1,0 +1,19 @@
+.notification-container {
+    height: 64vh;
+    border: none;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+}
+
+nz-list {
+    padding: 24px;
+}
+
+::ng-deep nz-spin {
+    border-bottom: 1px solid rgba(0, 0, 0, .06);
+}
+
+::ng-deep .ant-list-item-meta-avatar {
+    margin-right: 0px;
+    margin-top: -5px;
+}

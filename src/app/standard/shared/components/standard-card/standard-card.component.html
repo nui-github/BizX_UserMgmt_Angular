@@ -1,0 +1,20 @@
+<!-- <div class="container-fluid"> -->
+  <div nz-row>
+    <div nz-col nzSpan="24">
+      <nz-card>
+        <div nz-row nzAlign="middle" class="d-flex align-items-center">
+          <div nz-col nzSpan="16">
+            <h4 class="card-title mb-0">{{cardTile | translate }}</h4>
+          </div>
+          <div class="ms-auto">
+
+            <ng-container *ngTemplateOutlet="actionNewTemplate"></ng-container>
+          </div>
+        </div>
+        <p class="card-subtitle mb-3">{{cardSubtile | translate}}</p>
+
+        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+      </nz-card>
+    </div>
+  </div>
+<!-- </div> -->

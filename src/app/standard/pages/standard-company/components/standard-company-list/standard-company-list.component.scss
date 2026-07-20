@@ -1,0 +1,59 @@
+.grid-row-1{
+  grid-row: 1;
+  // background-color: green;
+}
+.grid-row-2{
+  grid-row: 2;
+  margin-top: 0.5em;
+  // background-color: red;
+}
+.title-card{
+  padding-right: 0px !important;
+}
+.sub-title-card{
+  font-size: large !important;
+}
+
+.form-label{
+  font-size: large !important;
+}
+
+.form-label-small{
+  font-size: large !important;
+}
+
+.status-active{
+  font-size: x-large !important;
+  // color: #13DEB9 !important;
+}
+
+.status-inactive{
+  font-size: x-large !important;
+  // color: #13DEB9 !important;
+}
+
+.btn-unlock{
+  color: #539BFF !important;
+}
+
+.status{
+  color: #5A6A85 !important;
+  font-weight: 300 !important;
+  font-size: large !important;
+  border-left: 1px solid #e6e6e6 !important;
+  padding-left: 1em !important;
+  // margin-bottom: 10px !important;
+}
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.test-center {
+  align-content: center !important;
+}
+
+.nz-list-empty {
+  color: rgba(var(--bs-body-color-rgb),.65) !important;
+}

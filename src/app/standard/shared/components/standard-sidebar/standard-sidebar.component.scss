@@ -1,0 +1,39 @@
+.app-logo {
+  height: inherit !important;
+  width: 120px !important;
+  display: flex;
+}
+
+.app-name {
+  font-size: 18px;
+}
+
+.app-version {
+  font-size: 12px;
+  font-weight: lighter;
+  color: #b2b2b2;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.container-app-info {
+  display: inline-table;
+}
+
+.simplebar-wrapper {
+  margin: 0px -24px;
+}
+
+.simplebar-wrapper {
+  right: 0px;
+  bottom: 0px;
+}
+.simplebar-content-wrapper {
+  height: 100%;
+  overflow: hidden scroll;
+}
+.simplebar-content {
+  padding: 0px 24px;
+}

@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.role.input.title" cardSubtile="pages.role.input.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['ROLE_CREATE'])) {
+      <button id="rmnl-add-btn" class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/role/add']"
+        >
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-role-detail></app-standard-role-detail>
+    } @else {
+      <app-standard-role-list></app-standard-role-list>
+    }
+  </ng-template>
+
+</app-standard-card>

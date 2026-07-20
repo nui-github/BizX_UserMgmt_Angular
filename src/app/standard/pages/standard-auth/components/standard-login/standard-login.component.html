@@ -1,0 +1,83 @@
+<div class="auth-customizer-none">
+  <div
+    class="position-relative overflow-hidden radial-gradient min-vh-100 w-100 d-flex align-items-center justify-content-center"
+  >
+    <div class="d-flex align-items-center justify-content-center w-100">
+      <div class="row justify-content-center w-100">
+        <div class="col-md-8 col-lg-6 col-xxl-3 auth-card">
+          <div class="card mb-0">
+            <div class="card-body">
+              <div class="d-flex align-items-center logo-container mb-5">
+                <img class="app-logo" alt="Logo-Dark" />
+              </div>
+              <form [formGroup]="formGroup" novalidate (ngSubmit)="onSubmit()">
+                <div class="mb-3">
+                  <label for="login-username" class="form-label col-12"
+                    >Username
+                    <br />
+                    <span class="form-label-small">ชื่อบัญชีผู้ใช้งาน</span>
+                  </label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="login-username"
+                    name="login-username"
+                    placeholder="Username"
+                    formControlName="username"
+                    [ngClass]="{ 'is-invalid': isSubmit && username.errors }"
+                  />
+                  <div
+                    class="invalid-tooltip"
+                    *ngIf="username.errors && (username.dirty || username.touched || isSubmit)"
+                  >
+                    <span *ngIf="username.errors['required']"> Please enter a username. </span>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="login-password" class="form-label"
+                    >Password
+                    <br />
+                    <span class="form-label-small">รหัสผ่าน</span>
+                  </label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="login-password"
+                    name="login-password"
+                    formControlName="password"
+                    placeholder="Password"
+                    [ngClass]="{ 'is-invalid': isSubmit && password.errors }"
+                  />
+                  <div
+                    class="invalid-tooltip"
+                    *ngIf="password.errors && (password.dirty || password.touched || isSubmit)"
+                  >
+                    <span *ngIf="password.errors['required']"> Please enter a password. </span>
+                  </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                  <div class="form-check"></div>
+                  <a class="text-primary fw-medium" [routerLink]="['/auth/forgotpassword']">Forgot Password ?</a>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Sign In</button>
+                <div class="d-flex align-items-center justify-content-center">
+                  @if(configuration['REGISTER'] == '1'){
+                  <span>Don't have an account ?</span>
+                  <a
+                    href="javascript:void(0);"
+                    class="text-primary fw-medium ms-2"
+                    title="Register"
+                    (click)="register()"
+                    *ngIf="configuration['REGISTER'] == '1'"
+                    >Create an account</a
+                  >
+                  }
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,5 @@
+<!-- <div class="invalid-tooltip" *ngIf="errorMessage !== null">
+    <span>{{errorMessage}}</span>
+</div> -->
+<span *ngIf="errorMessage !== null"> {{errorMessage != undefined ? (errorMessage | translate) : ""}} </span>
+<!-- <span *ngIf="errorMessage !== null"> {{errorMessage}} </span> -->

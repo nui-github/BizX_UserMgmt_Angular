@@ -1,0 +1,53 @@
+<div class="text-pagination-total p-0">
+  <div class="row">
+    <ng-container *ngIf="pagination.collectionSize == 0; else elseTemplate">
+      <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
+        <!-- Showing 0 to 0 of 0 entries -->
+        {{i18n.pagination.showing |  translate}} 0 {{i18n.pagination.to |  translate}} 0 {{i18n.pagination.of |  translate}} 0 {{i18n.pagination.entries |  translate}}
+      </div>
+    </ng-container>
+    <ng-template #elseTemplate>
+      <div class="col-12 col-md-6 d-flex justify-content-center justify-content-md-start">
+        <!-- {{showingMessage(pagination)}} -->
+        {{message(pagination)}}
+        {{ i18n.pagination.showing | translate}} {{start}} {{ i18n.pagination.to | translate}} {{end}} {{ i18n.pagination.of | translate}}&nbsp;<p id="total-item-entries">{{page}}</p>&nbsp;{{ i18n.pagination.entries | translate}}
+      </div>
+    </ng-template>
+    <div class="d-none d-md-block col-12 col-md-6">
+      <!-- <pagination class="d-flex justify-content-center justify-content-md-end" [(ngModel)]="pagination.page"
+        (pageChanged)="paginationOnChange($event)" [boundaryLinks]="true" [rotate]="true"
+        [itemsPerPage]="pagination.pageSize" [totalItems]="pagination.collectionSize" [maxSize]="5"
+        previousText="{{i18n.pagination.previousText |  translate}}" nextText="{{i18n.pagination.nextText |  translate}}" firstText="{{i18n.pagination.firstText |  translate}}" lastText="{{i18n.pagination.lastText |  translate}}">
+      </pagination> -->
+      <nz-pagination (nzPageIndexChange)="nzPaginationOnChange($event)" [nzPageIndex]="1" [nzPageSize]="pagination.pageSize" [nzTotal]="pagination.collectionSize" [nzItemRender]="renderItemTemplate"></nz-pagination>
+    </div>
+    <div class="d-md-none col-12">
+      <!-- <pagination class="d-flex justify-content-center justify-content-md-end" [(ngModel)]="pagination.page"
+        (pageChanged)="paginationOnChange($event)" [boundaryLinks]="true" [rotate]="true"
+        [itemsPerPage]="pagination.pageSize" [totalItems]="pagination.collectionSize" [maxSize]="5"
+        previousText="{{i18n.pagination.previousText | translate}}" nextText="{{i18n.pagination.nextText |  translate}}" firstText="{{i18n.pagination.firstText |  translate}}" lastText="{{i18n.pagination.lastText |  translate}}">
+      </pagination> -->
+      <nz-pagination (nzPageIndexChange)="nzPaginationOnChange($event)" [nzPageIndex]="1" [nzPageSize]="pagination.pageSize" [nzTotal]="pagination.collectionSize" [nzItemRender]="renderItemTemplate"></nz-pagination>
+    </div>
+  </div>
+</div>
+<ng-template #renderItemTemplate let-type let-page="page">
+  @switch (type) {
+    @case ('page') {
+      <a>{{ page }}</a>
+    }
+    @case ('prev') {
+      <a>{{i18n.pagination.previousText | translate}}</a>
+    }
+    @case ('next') {
+      <a>{{i18n.pagination.nextText |  translate}}</a>
+    }
+    @case ('prev_5') {
+      <a><<</a>
+    }
+    @case ('next_5') {
+      <a>>></a>
+    }
+  }
+</ng-template>
+ <!-- previousText="&lsaquo;" nextText="&rsaquo;" firstText="&laquo;" lastText="&raquo;"> -->

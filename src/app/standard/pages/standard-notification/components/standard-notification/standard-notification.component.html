@@ -1,0 +1,61 @@
+<li class="nav-item nav-icon-hover-bg rounded-circle dropdown">
+  <a class="nav-link position-relative" href="javascript:void(0)" id="drop2" aria-expanded="false">
+    <i class="ti ti-bell-ringing"></i>
+    <span
+      class="notification-badge bg-primary rounded-circle position-absolute d-flex align-items-center justify-content-center notification-badge"
+      [ngClass]="{'news':totalNotification > 0, '':totalNotification == 0}"
+    >
+    </span>
+  </a>
+  <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+    <div class="d-flex align-items-center justify-content-between py-3 px-4">
+      <h5 class="mb-0 fs-5 fw-semibold">{{ notificationMessageTitle | translate }}</h5>
+      <span class="badge text-bg-primary rounded-4 px-3 py-1 lh-sm">{{totalNotification}} {{ notificationMessageNews | translate }}</span>
+    </div>
+    <div class="h-n50 profile-dropdown position-relative simplebar-scrollable-y" data-simplebar="init">
+      <div class="simplebar-wrapper">
+        <div class="simplebar-height-auto-observer-wrapper">
+          <div class="simplebar-height-auto-observer"></div>
+        </div>
+        <div class="simplebar-mask">
+          <div class="simplebar-offset">
+            <div class="simplebar-content-wrapper overflow-notofication" tabindex="0" role="region" aria-label="scrollable content">
+              <div class="simplebar-content p-0">
+                @if (this.notifications != null && this.notifications.length > 0) {
+                  @for (item of this.notifications; track $index) {
+                    <a href="javascript:void(0)" class="d-flex align-items-center dropdown-item" (click)="eventOnClickNotification(item)">
+                      <!-- <span class="me-3">
+                        <img src="assets/images/profile/user-2.jpg" alt="user" class="rounded-circle" width="48"
+                          height="48">
+                      </span> -->
+                      <!-- <div class="w-100">
+                        <div class="d-flex justify-content-between">
+                          <h6 class="mb-1 fw-semibold lh-base">{{item.subject}}</h6>
+                          <small>{{item.timesAgoText}}</small>
+                        </div>
+
+                        <p class="fs-2 d-block text-body-secondary">{{item.detail}}</p>
+                      </div> -->
+                      <div class="w-100">
+                        <div class="d-flex justify-content-between">
+                          <h6 class="mb-1 fw-semibold lh-base message">{{item.subject}}</h6>
+                          <small><img src="./assets/images/standard/dot.png" class="icon-nonread" *ngIf="!item.isRead" />{{item.timesAgoText}}</small>
+                        </div>
+
+                        <p class="fs-2 d-block text-body-secondary message">{{item.detail}}</p>
+                      </div>
+                    </a>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="simplebar-placeholder"></div>
+      </div>
+    </div>
+    <div class="py-6 px-7 mb-1">
+      <button class="btn btn-outline-primary w-100" (click)="eventGo2Tracking()">{{ notificationMessageSeeAllNoti | translate }}</button>
+    </div>
+  </div>
+</li>

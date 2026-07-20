@@ -1,0 +1,39 @@
+.status-active{
+  font-size: x-large !important;
+}
+
+.status-inactive{
+  font-size: x-large !important;
+}
+
+.btn-unlock{
+  color: #539BFF !important;
+}
+
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.box-status {
+  display: flex;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: 10px;
+  background-color: #13DEB9;
+  color: white;
+}
+
+.status{
+  color: #5A6A85 !important;
+  font-weight: 300 !important;
+  font-size: large !important;
+  border-left: 1px solid #e6e6e6 !important;
+  padding-left: 1em !important;
+  // margin-bottom: 10px !important;
+}
+
+.nz-list-empty {
+  color: rgba(var(--bs-body-color-rgb),.65) !important;
+}

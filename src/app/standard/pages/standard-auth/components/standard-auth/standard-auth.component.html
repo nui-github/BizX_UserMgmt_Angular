@@ -1,0 +1,17 @@
+@if (errorMessage && !isLoading && !isSuccess) {
+<div class="error-section">
+    <div class="error-icon">
+        <i class="fa-solid fa-exclamation-triangle"></i>
+    </div>
+    <h2>เกิดข้อผิดพลาด</h2>
+    <p class="error-message">{{ errorMessage }}</p>
+    <div class="action-buttons">
+        <button nz-button nzType="primary" (click)="retryProcess()">
+            <i class="fa-solid fa-refresh"></i> ลองใหม่
+        </button>
+        <button nz-button nzType="default" (click)="closeWindow()">
+            <i class="fa-solid fa-home"></i> ปิดหน้าต่างนี้
+        </button>
+    </div>
+</div>
+}

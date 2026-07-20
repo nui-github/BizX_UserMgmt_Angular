@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.group.input.title" cardSubtile="pages.group.input.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['GROUP_CREATE'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/group/add']"
+       id="gmnl-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-group-detail></app-standard-group-detail>
+    } @else {
+      <app-standard-group-list></app-standard-group-list>
+    }
+  </ng-template>
+
+</app-standard-card>

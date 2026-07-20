@@ -1,0 +1,190 @@
+<header class="topbar shadow-sm">
+  <div class="with-vertical"><!-- ---------------------------------- -->
+    <!-- Start Vertical Layout Header -->
+    <!-- ---------------------------------- -->
+    <nav class="navbar navbar-expand-lg p-0">
+      <ul class="navbar-nav">
+        <li class="nav-item nav-icon-hover-bg rounded-circle ms-n2">
+          <a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)" (click)="toggleSidebar()">
+            <i class="ti ti-menu-2"></i>
+          </a>
+        </li>
+      </ul>
+
+
+      <div class="d-block d-lg-none py-4">
+      </div>
+      <a class="navbar-toggler nav-icon-hover-bg rounded-circle p-0 mx-0 border-0" href="javascript:void(0)"
+        data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <i class="ti ti-dots fs-7"></i>
+      </a>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <div class="d-flex align-items-center justify-content-between">
+          <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-center">
+
+            <li class="nav-item nav-icon-hover-bg rounded-circle">
+              @if (this.selectedTheme == 'dark') {
+                <a class="nav-link sun light-layout d-flex" href="javascript:void(0)" (click)="toggleTheme('light')">
+                  <i class="ti ti-sun sun"></i>
+                </a>
+              } @else {
+                <a class="nav-link moon dark-layout d-flex" href="javascript:void(0)" (click)="toggleTheme('dark')">
+                  <i class="ti ti-moon moon"></i>
+                </a>
+              }
+            </li>
+            <li class="nav-item nav-icon-hover-bg rounded-circle dropdown">
+              <a class="nav-link" href="javascript:void(0)" id="drop2" aria-expanded="false">
+                  
+                   @if(lang('en')){
+                    <img class="app-standard-logo-en-lang" alt="modernize-img-en" width="30px" height="20px">
+                   }@else if (lang('th')) {
+                    <img class="app-standard-logo-th-lang" alt="modernize-img-th" width="30px" height="20px">
+                   }@else {
+                    <i class="ti ti-world"></i>
+                   }
+              </a>
+              <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
+                <div class="message-body">
+                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item" [ngClass]="{ 'lang-select': lang('en') }" (click)="useLanguage('en')">
+                    <div class="position-relative">
+                      <!-- <img src="../assets/images/svgs/icon-flag-en.svg" alt="modernize-img" width="20px" height="20px"
+                        class="rounded-circle object-fit-cover round-20"> -->
+                    </div>
+                    <img class="app-standard-logo-en-lang" alt="modernize-img-en" width="30px" height="20px">
+                    <p class="mb-0 fs-3">English (UK)</p>
+                  </a>
+                  <a href="javascript:void(0)" class="d-flex align-items-center gap-2 py-3 px-4 dropdown-item" [ngClass]="{ 'lang-select': lang('th') }" (click)="useLanguage('th')">
+                    <div class="position-relative">
+                      <!-- <img src="../assets/images/svgs/icon-flag-cn.svg" alt="modernize-img" width="20px" height="20px"
+                        class="rounded-circle object-fit-cover round-20"> -->
+                    </div>
+                    <img class="app-standard-logo-th-lang" alt="modernize-img-th" width="30px" height="20px">
+                    <p class="mb-0 fs-3">ไทย (TH)</p>
+                  </a>
+                </div>
+              </div>
+            </li>
+            <!-- ------------------------------- -->
+            <!-- end language Dropdown -->
+            <!-- ------------------------------- -->
+
+            <!-- ------------------------------- -->
+            <!-- start shopping cart Dropdown -->
+            <!-- ------------------------------- -->
+            <!-- <li class="nav-item nav-icon-hover-bg rounded-circle">
+              <a class="nav-link position-relative" href="javascript:void(0)" data-bs-toggle="offcanvas"
+                data-bs-target="#offcanvasRight" aria-controls="offcanvasRight">
+                <i class="ti ti-basket"></i>
+                <span class="popup-badge rounded-pill bg-danger text-white fs-2">2</span>
+              </a>
+            </li> -->
+            <!-- ------------------------------- -->
+            <!-- end shopping cart Dropdown -->
+            <!-- ------------------------------- -->
+
+            <!-- ------------------------------- -->
+            <!-- start notification Dropdown -->
+            <!-- ------------------------------- -->
+            <!-- <app-standard-notification [uid]="this.currentUser['uid']"></app-standard-notification> -->
+
+            <ng-container *ngTemplateOutlet="notificationDropdownHeader || defaultNotificationDropdownHeader"></ng-container>
+            <ng-template #defaultNotificationDropdownHeader>
+              <app-standard-notification [uid]="this.currentUser['uid']" (onPushedNotification)="countNotification($event)"></app-standard-notification>
+            </ng-template>
+            <!-- ------------------------------- -->
+            <!-- end notification Dropdown -->
+            <!-- ------------------------------- -->
+
+            <!-- ------------------------------- -->
+            <!-- start profile Dropdown -->
+            <!-- ------------------------------- -->
+            <ng-container *ngTemplateOutlet="profileDropdownHeader || defaultProfileDropdownHeader"></ng-container>
+            <ng-template #defaultProfileDropdownHeader>
+              <li class="nav-item dropdown">
+                <a class="nav-link position-relative pe-0" href="javascript:void(0)" id="drop1" aria-expanded="false">
+                  <div class="d-flex align-items-center">
+                    <div id="profileImage"></div>
+                  </div>
+                </a>
+                <div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
+                  <div class="profile-dropdown position-relative" data-simplebar="init">
+                    <div class="simplebar-wrapper m-0">
+                      <div class="simplebar-height-auto-observer-wrapper">
+                        <div class="simplebar-height-auto-observer"></div>
+                      </div>
+                      <div class="simplebar-mask">
+                        <div class="simplebar-offset">
+                          <div class="simplebar-content-wrapper" tabindex="0" role="region"
+                            aria-label="scrollable content">
+                            <div class="simplebar-content p-0">
+                              <div class="py-3 px-7 pb-0">
+                                <h5 class="mb-0 fs-5 fw-semibold">{{userProfile | translate}}</h5>
+                              </div>
+                              <div class="d-flex align-items-center py-9 mx-7 border-bottom">
+                                <img src="assets/img/{{currentUser['username']}}.png" alt="" onerror="this.onerror=null;this.src='assets/images/avatar.png'" class="rounded-circle" width="80"
+                                  height="80" alt="modernize-img">
+                                <div class="ms-3">
+                                  <h5 class="mb-1 fs-3">{{currentUser['username']}}</h5>
+                                  <span class="mb-1 d-block">{{currentUser['firstname'] + " " + currentUser["lastname"]}}</span>
+                                  <p class="mb-0 d-flex align-items-center gap-2">
+                                    <i class="ti ti-mail fs-4"></i> {{currentUser['email']}}
+                                  </p>
+                                </div>
+                              </div>
+                              <div class="message-body">
+                                <a href="javascript:void(0);" (click)="profileSetting()" class="py-8 px-7 mt-8 d-flex align-items-center">
+                                  <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6"><i class="ti ti-user-circle "></i></span>
+                                  <div class="w-100 ps-3">
+                                    <h6 class="mb-1 fs-3 fw-semibold lh-base">{{myProfile | translate}}</h6>
+                                    <span class="fs-2 d-block text-body-secondary">{{ accountSetting | translate}}</span>
+                                  </div>
+                                </a>
+                                <a href="javascript:void(0);" title="change-password" class="py-8 px-7 d-flex align-items-center" (click)="changePassword()">
+                                  <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6"> <i class="ti ti-lock-access"></i></span>
+                                  <div class="w-100 ps-3">
+                                    <h6 class="mb-1 fs-3 fw-semibold lh-base">{{ changePasswordMessage | translate}}</h6>
+                                  </div>
+                                </a>
+                              </div>
+                              <div class="d-grid py-4 px-7 pt-8">
+                                <a href="javascript:void(0);" (click)="logout()" class="btn btn-outline-primary">
+
+                                  <i class="ti ti-power"></i>
+                                  {{ logOutMessage | translate }}</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="simplebar-placeholder"></div>
+                    </div>
+                    <div class="simplebar-track simplebar-horizontal">
+                      <div class="simplebar-scrollbar simplebar-scrollbar-horizontal"></div>
+                    </div>
+                    <div class="simplebar-track simplebar-vertical">
+                      <div class="simplebar-scrollbar simplebar-scrollbar-vertical"></div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ng-template>
+
+            <!-- ------------------------------- -->
+            <!-- end profile Dropdown -->
+            <!-- ------------------------------- -->
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- ---------------------------------- -->
+    <!-- End Vertical Layout Header -->
+    <!-- ---------------------------------- -->
+
+    <!-- ------------------------------- -->
+    <!-- apps Dropdown in Small screen -->
+    <!-- ------------------------------- -->
+    <!--  Mobilenavbar -->
+  </div>
+</header>

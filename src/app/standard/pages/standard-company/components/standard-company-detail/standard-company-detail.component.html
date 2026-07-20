@@ -1,0 +1,236 @@
+<div nz-col [nzSpan]="24" class="section-title">
+  {{ informationTilte }}
+</div>
+@if (!selectedType) {
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputStep1Config"
+  >
+    <ng-template #submitTemplate>
+      <div class="d-flex flex-wrap gap-6 align-items-center">
+        <div>
+          <div class="text-center">
+            @if (hasPermissions && step == 1) {
+              <button
+                title="{{ i18n.buttons.next | translate }}"
+                type="button"
+                id="cmnc-next-btn"
+                class="btn btn-primary"
+                aria-expanded="false"
+                (click)="next()"
+              >
+                <i class="ti ti-chevron-right"></i>
+                {{ i18n.buttons.next | translate }}
+              </button>
+            }
+            <button
+              title="{{ i18n.buttons.cancel | translate }}"
+              type="button"
+              id="cmnc-cancel-btn"
+              class="btn btn-danger ms-6"
+              (click)="onClosed()"
+            >
+              {{ i18n.buttons.cancel | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </app-standard-form-card>
+  <ng-template #onlyNumber let-input="input" let-control="control" let-fb="formGroup">
+    <form [formGroup]="fb">
+      <input
+        type="text"
+        class="form-control"
+        id="{{ input.id }}"
+        name="{{ input.name }}"
+        [formControlName]="input.formControlName"
+        [placeholder]=""
+        maxlength="13"
+        appNumberInput
+        [ngClass]="{
+          'is-invalid':
+            (formGroup.controls['companyTaxId'].touched || formGroup.controls['companyTaxId'].dirty) &&
+            formGroup.controls['companyTaxId'].errors,
+        }"
+      />
+      @if (
+        fb.controls[input.formControlName].invalid &&
+        (fb.controls[input.formControlName].touched || fb.controls[input.formControlName].dirty || isSubmit)
+      ) {
+        <app-standard-error-message
+          class="invalid-tooltip"
+          [control]="fb.controls[input.formControlName]"
+          [fieldName]="input.label"
+          [messages]="input.errorMessages"
+        ></app-standard-error-message>
+      }
+    </form>
+  </ng-template>
+}
+@if (selectedType) {
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputInformationConfig"
+  >
+  </app-standard-form-card>
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ addressTilte }}
+  </div>
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputAddressInformationConfig"
+  >
+  </app-standard-form-card>
+  <form nz-form autocomplete="off" novalidate [nzLayout]="'vertical'" [formGroup]="formGroup">
+    <div nz-row [nzGutter]="16">
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="cmnc-company-street">
+            <span>
+              {{ i18n.company.streetLabel | translate }}
+              <br />
+              <span class="form-label-small">{{ i18n.company.streetSubLabel | translate }}</span>
+            </span>
+          </nz-form-label>
+          <nz-form-control>
+            <input
+              type="text"
+              class="form-control"
+              id="cmnc-company-street"
+              name="cmnc-company-street"
+              [placeholder]="
+                isCreated
+                  ? (i18n.company.streetLabel | translate) + ' / ' + (i18n.company.streetSubLabel | translate)
+                  : 'Please fill in'
+              "
+              formControlName="street"
+            />
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item>
+          <nz-form-control>
+            <app-standard-subdistrict
+              label="pages.company.detail.address.information.input.subDistrict.label"
+              subLabel="pages.company.detail.address.information.input.subDistrict.sublabel"
+              [control]="formGroup.controls['subDistrictName']"
+              [isSubmit]="isSubmit"
+              [isCreated]="isCreated"
+              [input]="subDistrictTypeaheadBase"
+              [isRequired]="true"
+              (onSelectChanged)="subDistrictChange($event)"
+            ></app-standard-subdistrict>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputAddressInformation2Config"
+  >
+  </app-standard-form-card>
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ contactTilte }}
+  </div>
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputContactInformationConfig"
+  >
+  </app-standard-form-card>
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ policyTitle }}
+  </div>
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="isSubmit"
+    [isCreated]="isCreated"
+    [inputConfig]="inputPolicyInformationConfig"
+  >
+  </app-standard-form-card>
+  @if (pageType.toLowerCase() == "edit" && cpid) {
+    <div nz-col [nzSpan]="24" class="section-title">
+      {{ "pages.company.detail.templateConfig.title" | translate }}
+    </div>
+    <div nz-row [nzGutter]="16">
+      <div nz-col [nzSpan]="24">
+        <app-company-template-config [cpid]="cpid"></app-company-template-config>
+      </div>
+    </div>
+  }
+  <app-standard-form-card
+    [formGroup]="formGroup"
+    [amountOfInputPerRow]="2"
+    [isSubmit]="false"
+    [isCreated]="false"
+    [inputConfig]="[]"
+  >
+    <ng-template #submitTemplate>
+      <div class="d-flex flex-wrap gap-6 align-items-center">
+        <div>
+          <div class="text-center">
+            @if (
+              permission.checkPermission(APP_PERMISSION["COMPANY_CREATE"]) &&
+              pageType.toLowerCase() == "add" && step == 2
+            ) {
+              <button
+                type="button"
+                id="cmnc-next-btn"
+                class="btn btn-outline-warning ms-6"
+                aria-expanded="false"
+                (click)="back()"
+              >
+                <i class="ti ti-chevron-left"></i>
+                {{ i18n.buttons.back | translate }}
+              </button>
+              &nbsp;
+            }
+            @if (
+              ((permission.checkPermission(APP_PERMISSION["COMPANY_CREATE"]) ||
+                permission.checkPermission(APP_PERMISSION["COMPANY_EDIT"])) &&
+                pageType.toLowerCase() == "add" && step == 2) ||
+              pageType.toLowerCase() == "edit"
+            ) {
+              <button
+                title="{{ i18n.buttons.save | translate }}"
+                type="button"
+                id="cmnc-save-btn"
+                class="btn btn-primary"
+                (click)="save()"
+              >
+                {{ i18n.buttons.save | translate }}
+              </button>
+            }
+            <button
+              title="{{ i18n.buttons.cancel | translate }}"
+              type="button"
+              id="cmnc-cancel-btn"
+              class="btn btn-danger ms-6"
+              (click)="onClosed()"
+            >
+              {{ i18n.buttons.cancel | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </app-standard-form-card>
+}

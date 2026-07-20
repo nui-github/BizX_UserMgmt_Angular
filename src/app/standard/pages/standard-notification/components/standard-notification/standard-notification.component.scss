@@ -1,0 +1,44 @@
+.message-body {
+  max-height: 360px !important;
+}
+
+.message {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon-nonread {
+  width: 20px;
+}
+.notification-badge {
+  position: absolute;
+  top: 3px;
+  right: 8px;
+  width: 10px;
+  height: 10px;
+  font-size: 0.75rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bs-primary);
+  border-radius: 50%;
+}
+.news{
+  background-color: red !important;
+}
+
+.overflow-notofication{
+  overflow-y: auto; 
+  overflow-wrap: break-word;
+}
+.simplebar-offset{
+  right: 0px !important; 
+  bottom: 0px !important; 
+}
+
+.simplebar-placeholder{
+  width: 0px !important; 
+  height: 0px !important; 
+}

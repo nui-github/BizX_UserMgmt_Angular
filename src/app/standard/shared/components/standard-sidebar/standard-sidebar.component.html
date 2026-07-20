@@ -1,0 +1,105 @@
+<aside class="left-sidebar with-vertical" (mouseenter)="onSidebarHover(true)" (mouseleave)="onSidebarHover(false)">
+  <div>
+    <!-- ---------------------------------- -->
+    <!-- Start Vertical Layout Sidebar -->
+    <!-- ---------------------------------- -->
+    <div class="brand-logo d-flex align-items-center justify-content-center">
+      <div nz-row class="mt-10">
+        <div nz-col [nzMd]="24">
+          <div nz-row [nzGutter]="16">
+            <div nz-col [nzMd]="6">
+              <a [routerLink]="['/mainmenu']" class="text-nowrap logo-img">
+                <img class="app-logo" alt="Logo-Dark" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <a
+        href="javascript:void(0)"
+        class="sidebartoggler ms-auto text-decoration-none fs-5 d-block d-xl-none"
+        (click)="toggleSidebar()"
+      >
+        <i class="ti ti-x"></i>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav scroll-sidebar simplebar-scrollable-y" data-simplebar="init">
+      <div class="simplebar-wrapper">
+        <div class="simplebar-height-auto-observer-wrapper">
+          <div class="simplebar-height-auto-observer"></div>
+        </div>
+        <div class="simplebar-mask">
+          <div class="simplebar-offset">
+            <div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content">
+              <div class="simplebar-content">
+                <ul id="sidebarnav">
+                  <!-- ---------------------------------- -->
+                  <!-- Home -->
+                  <!-- ---------------------------------- -->
+                  @for (menu of menus; track $index) { @if (menu.submenu?.length != 0) {
+                  <li class="sidebar-item">
+                    <a
+                      class="sidebar-link has-arrow"
+                      [class.active]="showMenu == menu.id"
+                      title="{{ menu.name }}"
+                      target="_self"
+                      [routerLink]="[]"
+                      (click)="addExpandClass(menu.id)"
+                      aria-expanded="false"
+                    >
+                      <span class="d-flex">
+                        <!-- <i class="ti ti-chart-donut-3"></i> -->
+                        <i class="ti {{ menu.icon }}"></i>
+                      </span>
+                      <span class="hide-menu">{{ menu.name }}</span>
+                    </a>
+                    <ul aria-expanded="false" class="collapse first-level" [class.in]="showMenu == menu.id">
+                      @for (submenu of menu.submenu; track $index) {
+                      <li class="sidebar-item">
+                        <a
+                          title="{{ submenu.name }}"
+                          id="sidebar-sub-menu-{{ submenu.id }}"
+                          routerLink="{{ submenu.url }}"
+                          [routerLinkActive]="['active']"
+                          class="sidebar-link"
+                        >
+                          <div class="round-16 d-flex align-items-center justify-content-center">
+                            <!-- <i class="ti ti-circle"></i> -->
+                            <i class="ti {{ submenu.icon }}"></i>
+                          </div>
+                          <span class="hide-menu text-wrap">{{ submenu.name }}</span>
+                        </a>
+                      </li>
+                      }
+                    </ul>
+                  </li>
+                  } @else {
+                  <li class="sidebar-item">
+                    <a
+                      class="sidebar-link"
+                      title="{{ menu.name }}"
+                      id="sidebar-menu-{{ menu.id }}"
+                      routerLink="{{ menu.url }}"
+                      [routerLinkActive]="['active']"
+                      target="_self"
+                      (click)="addExpandClass(menu.id)"
+                      aria-expanded="false"
+                    >
+                      <span>
+                        <i class="ti {{ menu.icon }}"></i>
+                      </span>
+                      <span class="hide-menu">{{ menu.name }}</span>
+                    </a>
+                  </li>
+                  } }
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+</aside>

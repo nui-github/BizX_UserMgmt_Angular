@@ -1,0 +1,92 @@
+<app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputConfig">
+</app-standard-form-card>
+@if(formGroup.controls['cpid'].value){
+  <form nz-form [formGroup]="formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'" >
+    <div nz-row [nzGutter]="16" >
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item >
+          <nz-form-label nzFor="gmn-roles">
+            <span>
+              {{menuLabel | translate}}
+            </span>
+          </nz-form-label>
+          <nz-form-control >
+            <ul id="role-menu">
+              <ng-template #rmRecusiveTemplate let-list="list">
+                @for(menu of list.controls; track $index){
+                  <li [formGroup]="menu">
+                    <div id="rmnc-role-menu-{{menu.get('id').value}}" class="form-check">
+                      @if(permission.checkPermissionList([APP_PERMISSION['ROLE_EDIT']]) || permission.checkPermissionList([APP_PERMISSION['ROLE_ADD']])){
+                        <input class="form-check-input" formControlName="selected"
+                        type="checkbox" id="rmnc-role-menucheck-{{menu.get('id').value}}" [checked]="parentMenuChecked(menu)" (change)="menuChecked($event,menu)">
+                      }
+                      @if(!hasPermissions){
+                        <input [disabled]="true" class="form-check-input" formControlName="selected"
+                        type="checkbox" id="rmnc-role-menucheck-{{menu.get('id').value}}">
+                      }
+                      <label class="form-label" for="rmnc-role-menucheck-{{menu.get('id').value}}">{{renderMenuName(menu.get('id').value)}}</label>
+                    </div>
+                    <ul *ngIf="menu.get('subMenu') && menu.get('subMenu').controls.length > 0" class="sub-menu-margin">
+                      <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: menu.get('subMenu') }"></ng-container>
+                    </ul>
+                  </li>
+                }
+              </ng-template>
+              <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: m }"></ng-container>
+            </ul>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col [nzSpan]="24" [nzMd]="12">
+        <nz-form-item>
+          <nz-form-label nzFor="gmn-roles">
+            <span>
+              {{permissionLabel | translate}}
+            </span>
+          </nz-form-label>
+          <nz-form-control>
+            <input name="rmnc-role-search-permission" id="rmnc-role-search-permission"
+              class="form-control bg-transparent card-control-value search-permission"
+              type="text" [placeholder]="'Search ' + (permissionLabel | translate)" formControlName="searchPermission">
+              <ng-container *ngIf="!isLoadingPerm; else loadingPerm">
+                <br />
+                @for (item of perms | filter: (formControl.searchPermission.value ?? ''); track $index) {
+                  <div id="rmnc-role-perm" class="custom-control">
+                    @if(!hasPermissions){
+                      <input disabled="true" class="form-check-input"
+                      type="checkbox" id="rmnc-role-permcheck-{{$index}}">
+                    }
+                    @if(permission.checkPermissionList([APP_PERMISSION['ROLE_EDIT']]) || permission.checkPermissionList([APP_PERMISSION['ROLE_ADD']])){
+                      <input class="form-check-input" [(checked)]="item.selected" (change)="eventOnChangePermission(item)"
+                      type="checkbox" id="rmnc-role-permcheck-{{$index}}">
+                    }
+                    <label class="form-label" for="rmnc-role-permcheck-{{$index}}">&nbsp;
+                      {{item.permissionCode}}
+                    </label>
+                  </div>
+                }
+              </ng-container>
+              <ng-template #loadingPerm>
+                <!-- <app-loader size="sm" class="m-5"></app-loader> -->
+              </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+}
+<div class="d-flex flex-wrap gap-6 align-items-center">
+  <div>
+    <div class="text-center">
+      @if (hasPermissions) {
+      <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="save()">
+        {{i18n.buttons.save | translate}}
+      </button>
+      } &nbsp;
+      <button title="{{i18n.buttons.cancel | translate}}" type="button" id="umnc-cancel-btn" class="btn btn-outline-primary ms-6"
+        (click)="onClosed()">
+        {{i18n.buttons.cancel | translate}}
+      </button>
+    </div>
+  </div>
+</div>

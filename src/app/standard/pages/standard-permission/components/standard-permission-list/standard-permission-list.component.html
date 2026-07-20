@@ -1,0 +1,156 @@
+
+<app-standard-form-card [formGroup]="searchForm" [inputConfig]="inputConfig">
+
+  <ng-template #submitTemplate>
+    <div nz-row nzAlign="middle" class="d-flex flex-wrap gap-6 mb-3">
+      <div nz-col>
+        <button class="btn btn-primary" id="perm-search-btn" (click)="eventOnSearch()">
+          <i nz-icon nzType="search"></i>
+          {{i18n.buttons.search | translate}}
+        </button>
+        <button class="btn btn-outline-primary ms-6" id="perm-clearsearch-btn" (click)="eventOnClear()">
+          <i nz-icon nzType="filter"></i>
+          {{i18n.buttons.clear  | translate}}
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</app-standard-form-card>
+<div nz-row class="mb-3">
+  <div nz-col nzSpan="24" class="d-flex align-items-center justify-content-end">
+    <app-standard-showing-page (pageSizeChanged)="eventOnPageSizeChange($event)"></app-standard-showing-page>
+  </div>
+</div>
+<div nz-row>
+  <div nz-col nzSpan="24">
+    <nz-list nzGrid [nzLoading]="isLoading">
+      <div nz-row [nzGutter]="16">
+        @for (perm of responseItems; track perm) {
+          <div nz-col [nzSpan]="24">
+            <nz-list-item>
+              <nz-card><nz-card-meta [nzTitle]="extraTemplate">
+                <ng-template #extraTemplate>
+                  <div nz-row>
+                    <div nz-col [nzSpan]="24" [nzMd]="20">
+                      <div nz-row>
+                        <div nz-flex [nzVertical]="true">
+                          <label for="title-card-{{$index}}" class="form-label">{{i18n.permission.cardTitlePermissionCode | translate}}</label>
+                          <span id="perm-code-{{$index}}" class="form-label-small">{{perm.permissionCode}} </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div nz-col [nzSpan]="4" class="d-none d-md-block">
+                      <div nz-row nz-flex nzJustify="end">
+                        @if (permission.checkPermissionList([APP_PERMISSION['PERMISSION_EDIT'],
+                        APP_PERMISSION['PERMISSION_VIEW']])) {
+                        <a (click)="eventOnEdit(perm)" id="perm-items-edit-{{$index}}" title="{{i18n.buttons.view | translate}}" class="btn btn-primary btn-icon m-1">
+                          <i nz-icon nzType="search"></i>
+                        </a>
+                        }
+                        @if (permission.checkPermission(APP_PERMISSION['PERMISSION_DELETE'])) {
+                        <a (click)="eventOnDelete(perm)" id="perm-items-del-{{$index}}" title="{{i18n.buttons.delete | translate}}" class="btn btn-danger btn-icon m-1">
+                          <i nz-icon nzType="delete"></i>
+                        </a>
+                        }
+                      </div>
+                    </div>
+                    <div class="col-6 ms-auto d-flex d-md-none justify-content-end">
+                      <a nz-dropdown [nzDropdownMenu]="menu" class="ant-dropdown-link text-dark" id="new" aria-expanded="false">
+                        <i nz-icon nzType="ellipsis" nzTheme="outline"></i>
+                      </a>
+                      <nz-dropdown-menu #menu="nzDropdownMenu">
+
+                        <ul nz-menu nzSelectable>
+                          <li nz-menu-item *ngIf="permission.checkPermissionList([APP_PERMISSION['PERMISSION_EDIT'], APP_PERMISSION['PERMISSION_VIEW']])">
+                            <a title="{{i18n.buttons.view | translate}}" href="javascript:void(0);" id="perm-items-edit-{{$index}}" name="perm-items-edit-{{$index}}" (click)="eventOnEdit(perm)">
+                              <i nz-icon nzType="edit" nzTheme="outline"></i>
+                              {{i18n.buttons.edit | translate}}
+                            </a>
+                          </li>
+                          <li nz-menu-item *ngIf="permission.checkPermission(APP_PERMISSION['PERMISSION_DELETE'])">
+                            <a title="{{i18n.buttons.delete | translate}}" href="javascript:void(0);" id="perm-items-del-{{$index}}" name="perm-items-del-{{$index}}" (click)="eventOnDelete(perm)">
+                              <i nz-icon nzType="delete" nzTheme="outline"></i>
+                              {{i18n.buttons.delete | translate}}
+                            </a>
+                          </li>
+                        </ul>
+                      </nz-dropdown-menu>
+                    </div>
+                  </div>
+                </ng-template>
+              </nz-card-meta>
+            </nz-card>
+            </nz-list-item>
+          </div>
+        }
+      </div>
+      @if (responseItems?.length === 0) {
+        <nz-list-empty [nzNoResult]="customTpl">
+          <ng-template #customTpl let-name>
+            <div class="text-center nz-list-empty">
+              <span nz-icon nzType="smile"></span>
+              <p>{{i18n.fields.emptyData | translate}}</p>
+            </div>
+          </ng-template>
+        </nz-list-empty>
+      }
+    </nz-list>
+    <!-- @if (responseItems && responseItems.length > 0) {
+    @for (perm of responseItems; track $index) {
+    <nz-card class="mb-3" [nzLoading]="isLoading">
+      <nz-card-meta [nzTitle]="extraTemplate">
+        <ng-template #extraTemplate>
+          <div nz-row>
+            <div nz-col nzSpan="12">
+              {{perm.permissionCode}}
+            </div>
+            <div nz-col nzSpan="12" class="d-none d-md-block">
+              <div nz-row nz-flex nzJustify="end">
+                @if (permission.checkPermissionList([APP_PERMISSION['PERMISSION_EDIT'],
+                APP_PERMISSION['PERMISSION_VIEW']])) {
+                <a (click)="eventOnEdit(perm)" title="View" class="btn btn-primary btn-icon m-1">
+                  <i nz-icon nzType="search"></i>
+                </a>
+                }
+                @if (permission.checkPermission(APP_PERMISSION['PERMISSION_DELETE'])) {
+                <a (click)="eventOnDelete(perm)" title="Delete" class="btn btn-danger btn-icon m-1">
+                  <i nz-icon nzType="delete"></i>
+                </a>
+                }
+              </div>
+            </div>
+            <div class="col-6 ms-auto d-flex d-md-none justify-content-end">
+              <a nz-dropdown [nzDropdownMenu]="menu" class="ant-dropdown-link text-dark" id="new" aria-expanded="false">
+                <i nz-icon nzType="ellipsis" nzTheme="outline"></i>
+              </a>
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+
+                <ul nz-menu nzSelectable>
+                  <li nz-menu-item *ngIf="permission.checkPermissionList([APP_PERMISSION['PERMISSION_EDIT'], APP_PERMISSION['PERMISSION_VIEW']])">
+                    <a title="View" href="javascript:void(0);" id="perm-items-edit-{{$index}}" name="perm-items-edit-{{$index}}" (click)="eventOnEdit(perm)">
+                      <i nz-icon nzType="edit" nzTheme="outline"></i>
+                      Edit
+                    </a>
+                  </li>
+                  <li nz-menu-item *ngIf="permission.checkPermission(APP_PERMISSION['PERMISSION_DELETE'])">
+                    <a title="Delete" href="javascript:void(0);" id="perm-items-del-{{$index}}" name="perm-items-del-{{$index}}" (click)="eventOnDelete(perm)">
+                      <i nz-icon nzType="delete" nzTheme="outline"></i>
+                      Delete
+                    </a>
+                  </li>
+                </ul>
+              </nz-dropdown-menu>
+            </div>
+          </div>
+        </ng-template>
+      </nz-card-meta>
+    </nz-card>
+    }
+    } @else {
+    <p class="card-subtitle text-center mb-3">No data found.</p>
+    } -->
+  </div>
+  <div nz-col nzSpan="24">
+    <app-pagination [pagination]="pagination" (pageChanged)="eventPageOnChanges($event)"></app-pagination>
+  </div>
+</div>

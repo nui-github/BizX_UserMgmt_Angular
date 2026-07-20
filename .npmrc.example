@@ -1,0 +1,3 @@
+registry=https://nexus.netbay.co.th/private-package/repository/npm-group/
+email=your-email@netbay.co.th
+//nexus.netbay.co.th/private-package/repository/npm-group/:_auth="BASE64_OF_username:password"

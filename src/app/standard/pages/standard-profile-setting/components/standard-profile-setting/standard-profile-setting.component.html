@@ -1,0 +1,42 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+        <div class="card-body pb-0">
+          <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade active show" id="pills-account" role="tabpanel"
+              aria-labelledby="pills-account-tab" tabindex="0">
+              <div class="row">
+                <div class="col-lg-12 d-flex align-items-stretch">
+                  <div class="card w-100 border position-relative overflow-hidden">
+                      <h3 class="text-center p-4">{{welcome | translate}} </h3>
+                      <div class="text-center mb-3">
+                        <img src="./assets/img/{{currentUser['username']}}.png" alt=""
+                          onerror="this.onerror=null;this.src='assets/images/avatar.png'" alt="modernize-img"
+                          class="img-fluid rounded-circle" width="120" height="120">
+                      </div>
+                      <hr>
+                      <app-standard-card cardTile="pages.profile.setting.page.title" cardSubtile="pages.profile.setting.page.subtitle">
+                        
+                        <ng-template #contentTemplate>
+                          <app-standard-form-card [formGroup]="profileSettingForm" [amountOfInputPerRow]="1"  [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputConfig">
+                            <ng-template #submitTemplate>
+                              <div class="d-flex align-items-center justify-content-end gap-6">
+                                @if (!isEdited) {
+                                  <button title="Edit" type="button" id="umpf-save-btn" class="btn btn-primary" (click)="onEdit()">{{ editButtonMessage | translate}}</button>
+                                } @else {
+                                  <button title="Save" type="button" id="umpf-save-btn" class="btn btn-primary" (click)="onSave()" [disabled]="profileSettingForm.invalid">{{ saveButtonMessage | translate}}</button>
+                                  <button title="Cancel" type="button" id="umpf-cancel-btn" (click)="onCancel()" class="btn bg-danger-subtle text-danger">{{ cancelButtonMessage | translate}}</button>
+                                }
+                            </div>
+                          </ng-template>
+                          </app-standard-form-card>
+                        </ng-template>
+                      </app-standard-card>
+                  </div>
+                </div>
+    </div>
+  </div>
+</div>
+
+
+

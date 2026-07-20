@@ -1,0 +1,22 @@
+.sub-menu-margin{
+  margin-left: 3em !important;
+}
+
+.role-error {
+  position: inherit;
+  top: 100%;
+  z-index: 5;
+  /* display: none; */
+  max-width: 100%;
+  padding: .5rem;
+  margin-top: .1rem;
+  font-size: .875rem;
+  line-height: 1;
+  color: #fff;
+  background-color: var(--bs-danger);
+  border-radius: .2rem;
+}
+
+.role-error-text {
+  color: #FFFFFF;
+}

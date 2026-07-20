@@ -1,0 +1,78 @@
+<app-standard-form-card [formGroup]="formGroup" [inputConfig]="inputConfig" [amountOfInputPerRow]="2" [isSubmit]="isSubmit"></app-standard-form-card>
+<form nz-form autocomplete="off" novalidate [nzLayout]="'vertical'" >
+  <div nz-row [nzGutter]="16" >
+    <div nz-col [nzSpan]="24" [nzMd]="12">
+      <nz-form-item >
+        <nz-form-label nzFor="gmn-roles">
+          <span>
+            {{ menuLabel | translate }}
+          </span>
+        </nz-form-label>
+        <nz-form-control>
+          <ng-container>
+            <ul class="">
+              <ng-template #rmRecusiveTemplate let-list="list">
+                <li [formGroup]="menu" *ngFor="let menu of list.controls; index as i;">
+                  <div id="ctmnc-company-type-menu-{{menu.get('id').value}}" class="form-check">
+                    <input *ngIf="permissionsEdit||permissionsAdd" class="form-check-input" formControlName="selected"
+                      type="checkbox" id="ctmnc-company-type-menucheck-{{menu.get('id').value}}" [checked]="parentMenuChecked(menu)" (change)="menuChecked($event,menu)"  >
+                    <input *ngIf="!permissionsEdit&&!permissionsAdd" [disabled]="check" class="form-check-input" formControlName="selected"
+                      type="checkbox" id="ctmnc-company-type-menucheck-{{menu.get('id').value}}">
+                    <label class="form-check-label text-dark card-control-value" for="ctmnc-company-type-menucheck-{{menu.get('id').value}}">{{renderMenuName(menu.get('id').value)}}</label>
+                  </div>
+                  <ul *ngIf="menu.get('subMenu') && menu.get('subMenu').controls.length > 0" class="submenu">
+                    <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: menu.get('subMenu') }"></ng-container>
+                  </ul>
+                </li>
+              </ng-template>
+              <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: m }"></ng-container>
+            </ul>
+          </ng-container>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+</form>
+<!-- <div class="row align-items-start">
+  <div class="col-12 col-lg-6 form-row form-group align-items-start mb-2">
+    <label for="ctmnc-company-type-menu" class="col-form-label">{{ menuLabel | translate }}</label>
+    <div class="col-9 px-1">
+      <ng-container>
+        <ul class="">
+          <ng-template #rmRecusiveTemplate let-list="list">
+            <li [formGroup]="menu" *ngFor="let menu of list.controls; index as i;">
+              <div id="ctmnc-company-type-menu-{{menu.get('id').value}}" class="form-check">
+                <input *ngIf="permissionsEdit||permissionsAdd" class="form-check-input" formControlName="selected"
+                  type="checkbox" id="ctmnc-company-type-menucheck-{{menu.get('id').value}}" [checked]="parentMenuChecked(menu)" (change)="menuChecked($event,menu)"  >
+                <input *ngIf="!permissionsEdit&&!permissionsAdd" [disabled]="check" class="form-check-input" formControlName="selected"
+                  type="checkbox" id="ctmnc-company-type-menucheck-{{menu.get('id').value}}">
+                <label class="form-check-label text-dark card-control-value" for="ctmnc-company-type-menucheck-{{menu.get('id').value}}">{{renderMenuName(menu.get('id').value)}}</label>
+              </div>
+              <ul *ngIf="menu.get('subMenu') && menu.get('subMenu').controls.length > 0" class="submenu">
+                <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: menu.get('subMenu') }"></ng-container>
+              </ul>
+            </li>
+          </ng-template>
+          <ng-container *ngTemplateOutlet="rmRecusiveTemplate; context: { list: m }"></ng-container>
+        </ul>
+      </ng-container>
+    </div>
+  </div>
+</div> -->
+<div class="d-flex flex-wrap gap-6 align-items-center">
+  <div>
+    <div class="text-center">
+      @if (permissionsAdd || permissionsEdit) {
+      <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="onSave()">
+        {{i18n.buttons.save | translate}}
+      </button>
+      }
+      <button title="{{i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
+        (click)="onClosed()">
+        {{i18n.buttons.back | translate}}
+      </button>
+    </div>
+  </div>
+</div>
+
+

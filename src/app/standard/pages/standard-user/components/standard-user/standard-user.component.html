@@ -1,0 +1,20 @@
+<app-standard-card cardTile="pages.user.input.title" cardSubtile="pages.user.input.subtitle">
+  <ng-template #actionNewTemplate>
+    @if (!pageType && permissions.checkPermission(APP_PERMISSION['USER_CREATE'])) {
+      <button class="btn bg-primary-subtle text-primary" [routerLink]="['/mainmenu/user/add']"
+        id="umnl-add-btn">
+        <i nz-icon nzType="plus-circle"></i>
+        {{i18n.buttons.add | translate}}
+      </button>
+      }
+  </ng-template>
+
+  <ng-template #contentTemplate>
+    @if (pageType) {
+      <app-standard-user-detail></app-standard-user-detail>
+    } @else {
+      <app-standard-user-list></app-standard-user-list>
+    }
+  </ng-template>
+
+</app-standard-card>

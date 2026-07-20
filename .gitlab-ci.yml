@@ -1,0 +1,31 @@
+image: docker:19.03.8
+services:
+  - docker:dind
+    
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+  SHORT_SHA: $CI_BUILD_REF
+
+stages:
+  - package
+
+api-package:
+  only:
+    - /^release\/.*$/
+    - /^snapshot\/.*$/
+  stage: package
+  script:
+    - "type=$(echo $CI_COMMIT_REF_NAME | cut -d '/' -s -f 1)"
+    - "version=$(echo $CI_COMMIT_REF_NAME | cut -d '/' -s -f 2)"
+    - "repository_path=$(echo $CI_PROJECT_PATH | tr '[:upper:]' '[:lower:]')"
+    - echo $type $version $repository_path
+    - docker build --no-cache -t mobydick.netbay.co.th/${repository_path} .
+    - docker tag mobydick.netbay.co.th/${repository_path}:latest mobydick.netbay.co.th/${repository_path}:$SHORT_SHA
+    - docker tag mobydick.netbay.co.th/${repository_path}:latest mobydick.netbay.co.th/${repository_path}:${version}
+    - docker login --username=$REGISTRY_USERNAME --password=$REGISTRY_PASSWORD mobydick.netbay.co.th
+    - docker push mobydick.netbay.co.th/${repository_path}:latest
+    - docker push mobydick.netbay.co.th/${repository_path}:$SHORT_SHA
+    - if [ "$type" = "release" ]; then docker tag mobydick.netbay.co.th/${repository_path}:latest mobydick.netbay.co.th/${repository_path}:${version}; fi
+    - if [ "$type" = "snapshot" ]; then docker tag mobydick.netbay.co.th/${repository_path}:latest mobydick.netbay.co.th/${repository_path}:${version}-SNAPSHOT; fi
+    - if [ "$type" = "release" ]; then docker push mobydick.netbay.co.th/${repository_path}:${version}; fi
+    - if [ "$type" = "snapshot" ]; then docker push mobydick.netbay.co.th/${repository_path}:${version}-SNAPSHOT; fi

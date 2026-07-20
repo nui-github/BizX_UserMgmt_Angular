@@ -1,0 +1,113 @@
+<form nz-form [formGroup]="formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'">
+  @for (row of getRows(); track $index) {
+  <div nz-row [nzGutter]="16">
+    @for (input of row; track input) {
+    <div nz-col [nzSpan]="24" [nzMd]="input.rowspan ?? (24 / amountOfInputPerRow)" [nzOffset]="input.offset ?? null">
+      @if(input.showInput) {
+      <nz-form-item>
+
+        @if (input.type !== "switch" && input.type !== "radio" && input.type !== "checkbox") {
+          <nz-form-label [nzFor]="input.id">
+            <span>
+              @if (hasValidatorRequired(input.formControlName)) {
+              {{ input.label | translate }}&nbsp;<strong class="text-danger">*</strong>
+              } @else {
+              {{ input.label | translate }}
+              }
+              <br>
+              <span class="form-label-small">{{input.sublabel | translate }}</span>
+            </span>
+          </nz-form-label>
+        }
+        <nz-form-control>
+          @switch (input.type) {
+          @case ('select') {
+          <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true" [nzId]="input.id"
+            id="{{input.id}}" [formControlName]="input.formControlName"
+            nzPlaceHolder="{{placeholderSelect | translate}}"
+            (ngModelChange)="handleChange($event, input)"
+            [ngClass]="{ 'is-invalid':  isSubmit && formGroup.controls[input.formControlName].errors }">
+            <nz-option *ngFor="let item of input.options" [nzLabel]="item.label"
+              [nzValue]="item.value"></nz-option>
+          </nz-select>
+          }
+          @case ('selectValidate') {
+            <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true" [nzId]="input.id"
+              id="{{input.id}}" [formControlName]="input.formControlName"
+              nzPlaceHolder="{{placeholderSelect | translate}}"
+              (ngModelChange)="handleChange($event, input)"
+              [ngClass]="{ 'is-invalid': formGroup.controls[input.formControlName].errors && (formGroup.controls[input.formControlName].touched || formGroup.controls[input.formControlName].dirty || isSubmit)}">
+              <nz-option *ngFor="let item of input.options" [nzLabel]="item.label"
+                [nzValue]="item.value"></nz-option>
+            </nz-select>
+            }
+          @case ('switch') {
+
+          <label for="{{input.id}}">
+            <nz-switch [formControlName]="input.formControlName" [id]="input.id"
+              (ngModelChange)="handleChange($event, input)"></nz-switch>
+            <span>
+              {{ input.label | translate }} <br>
+            </span>
+          </label>
+          }
+          @case ('date') {
+            <nz-date-picker class="form-control" [formControlName]="input.formControlName" id="{{input.id}}"
+            [ngClass]="{ 'is-invalid':  isSubmit && formGroup.controls[input.formControlName].errors }"></nz-date-picker>
+          }
+          @case ('checkboxInput'){
+            <input type="number" class="form-control" id="{{input.id}}" name="{{input.name}}"
+            [formControlName]="input.formControlName" [placeholder]=" isCreated ? (input.label | translate) + ' / ' + (input.sublabel | translate) : (input.placeholder ?? (hasValidatorRequired(input.formControlName) ? 'Please' : 'Optional') + ' fill in ' + (input.label | translate) + '...'  )"
+            [ngClass]="{ 'is-invalid':  isSubmit && formGroup.controls[input.formControlName].errors }" />
+            <br />
+            <div class="form-group form-check mb-0">
+              <input
+                #inputChecked
+                type="checkbox"
+                class="form-check-input card-control-value"
+                id="{{input.id}}" name="{{input.name}}"
+                [checked]="
+                  this.formGroup.controls[input.formControlName].value == -1
+                "
+                (change)="
+                  changeInputCheckbox(
+                    input.formControlName,inputChecked.checked
+                  )
+                "
+              />
+              <label class="form-label" for="{{input.id}}"
+                >{{input.checkBoxLabel ?? '' | translate}}</label
+              >
+            </div>
+          }
+          @case ('textarea') {
+            <textarea class="form-control" id="{{input.id}}" name="{{input.name}}"
+            [formControlName]="input.formControlName" [placeholder]=" isCreated ? (input.label | translate) + ' / ' + (input.sublabel | translate) : ((input.placeholder  != undefined ? (input.placeholder | translate): undefined) ?? (hasValidatorRequired(input.formControlName) ? 'Please' : 'Optional') + ' fill in ' + (input.label | translate) + '...'  )"
+            [ngClass]="{ 'is-invalid':  (isSubmit && formGroup.controls[input.formControlName].errors) || ((formGroup.controls[input.formControlName].touched || formGroup.controls[input.formControlName].dirty) && formGroup.controls[input.formControlName].errors) }" ></textarea>
+          }
+          @case ('code') {
+            <input type ="code" class="form-control" id="{{input.id}}" name="{{input.name}}"
+            [formControlName]="input.formControlName" [placeholder]=" isCreated ? (input.label | translate) + ' / ' + (input.sublabel | translate) : ((input.placeholder  != undefined ? (input.placeholder | translate): undefined) ?? (hasValidatorRequired(input.formControlName) ? 'Please' : 'Optional') + ' fill in ' + (input.label | translate) + '...'  )"
+            [ngClass]="{ 'is-invalid':  isSubmit && formGroup.controls[input.formControlName].errors }"  appUppercaseInput appAlphanumericInput >
+          }
+          @case ('custom') {
+            <ng-container *ngTemplateOutlet="input.template ?? null; context: { input: input, formGroup: formGroup, control: formGroup.controls[input.formControlName] }"></ng-container>
+          }
+          @default {
+          <input type="{{input.type}}" class="form-control" id="{{input.id}}" name="{{input.name}}"
+            [formControlName]="input.formControlName" [placeholder]=" isCreated ? (input.label | translate) + ' / ' + (input.sublabel | translate) : ((input.placeholder  != undefined ? (input.placeholder | translate): undefined) ?? (hasValidatorRequired(input.formControlName) ? 'Please' : 'Optional') + ' fill in ' + (input.label | translate) + '...'  )"
+            [ngClass]="{ 'is-invalid': ((formGroup.controls[input.formControlName].touched || formGroup.controls[input.formControlName].dirty) && formGroup.controls[input.formControlName].errors) }" />
+          }
+        }
+          @if (formGroup.controls[input.formControlName].invalid && (formGroup.controls[input.formControlName].touched || formGroup.controls[input.formControlName].dirty || isSubmit)) {
+            <app-standard-error-message class="invalid-tooltip" [control]="formGroup.controls[input.formControlName]" [fieldName]="input.label" [messages]="input.errorMessages"></app-standard-error-message>
+          }
+        </nz-form-control>
+      </nz-form-item>
+      }
+    </div>
+    }
+  </div>
+  }
+  <ng-container *ngTemplateOutlet="submitTemplate"></ng-container>
+</form>

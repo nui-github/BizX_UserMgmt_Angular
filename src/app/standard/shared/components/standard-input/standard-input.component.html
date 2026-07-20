@@ -1,0 +1,15 @@
+<label for="{{id}}" class="form-label">{{label}}&nbsp;<strong class="text-danger" *ngIf="isRequired">*</strong>
+	<br>
+	<span class="form-label-small">{{subLabel}}</span>
+</label>
+<ng-container *ngTemplateOutlet="contentTemplate || defaultTemplate"></ng-container>
+
+<ng-template #defaultTemplate>
+
+	<input class="form-control" [ngClass]="{ 'is-invalid': isValidated && control.errors, 'is-valid': isOptional? false : isValidated && !control.errors }"
+	[type]="type" [id]="id" [name]="name" [formControl]="control" [placeholder]="placeholder"/>
+
+	@if (control && control.errors && (control.dirty || control.touched || this.isSubmit)) {
+		<app-standard-error-message class="invalid-tooltip" [control]="control" [fieldName]="fieldName" [messages]="errorMessages"></app-standard-error-message>
+	}
+</ng-template>

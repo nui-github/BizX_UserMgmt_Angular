@@ -1,0 +1,179 @@
+<br/>
+  <div class="d-none d-md-block">
+<nz-steps [nzCurrent]="current" [nzDirection]="'horizontal'" >
+  <nz-step nzTitle="{{ i18n.registerDetail.verificationTitle | translate }}"></nz-step>
+  <nz-step nzTitle="{{informationTitle}}"></nz-step>
+  <nz-step nzTitle="{{ i18n.registerDetail.attachmentTitle | translate }}"></nz-step>
+  <nz-step nzTitle="{{ i18n.registerDetail.userTitle | translate }}"></nz-step>
+</nz-steps>
+</div>
+<nz-steps [nzCurrent]="current" [nzDirection]="'vertical'" class="d-none d-sm-block d-md-none">
+  <nz-step nzTitle="{{ i18n.registerDetail.verificationTitle | translate }}"></nz-step>
+  <nz-step nzTitle="{{informationTitle}}"></nz-step>
+  <nz-step nzTitle="{{ i18n.registerDetail.attachmentTitle | translate }}"></nz-step>
+  <nz-step nzTitle="{{ i18n.registerDetail.userTitle | translate }}"></nz-step>
+</nz-steps>
+<div nz-col [nzSpan]="24" class="section-title">
+  <br/>
+</div>
+<br/>
+@if(step == 1){
+  <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputVerificationConfig">
+  </app-standard-form-card>
+  <ng-template #onlyNumber let-input="input" let-control="control" let-fb="formGroup">
+    <form [formGroup]="fb">
+      <input type="text" class="form-control" id="{{input.id}}" name="{{input.name}}"
+      [formControlName]="input.formControlName" [placeholder]="" maxlength="13" appNumberInput
+      [ngClass]="{ 'is-invalid': ((formGroup.controls['companyTaxId'].touched || formGroup.controls['companyTaxId'].dirty) && formGroup.controls['companyTaxId'].errors) }" />
+      @if (fb.controls[input.formControlName].invalid && (fb.controls[input.formControlName].touched || fb.controls[input.formControlName].dirty || isSubmit)) {
+        <app-standard-error-message class="invalid-tooltip" [control]="fb.controls[input.formControlName]" [fieldName]="input.label" [messages]="input.errorMessages"></app-standard-error-message>
+      }
+    </form>
+  </ng-template>
+}
+@if(step == 2){
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ informationTitle }}
+    </div>
+    @if(this.formGroup.controls.registerType !== null && this.formGroup.controls.registerType.value == 1){
+      <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputCompanyInformationConfig">
+      </app-standard-form-card>
+    }
+    @else {
+      <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputPersonalInformationConfig">
+      </app-standard-form-card>
+    }
+    <div nz-col [nzSpan]="24" class="section-title">
+      {{addressTitle}}
+    </div>
+    <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputAddressInformationConfig">
+    </app-standard-form-card>
+    <form nz-form [formGroup]="formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'">
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label nzFor="cmn-street">
+              <span>
+                {{i18n.registerDetail.streetLabel | translate}}
+                <br>
+                <span class="form-label-small">{{i18n.registerDetail.streetSubLabel| translate}}</span>
+              </span>
+            </nz-form-label>
+            <nz-form-control>
+              <input type="text" class="form-control" id="reg-com-company-street" name="reg-com-company-street" placeholder="Please fill in."
+                formControlName="street"/>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-control>
+              <app-standard-subdistrict
+                        label="pages.register.detail.address.information.input.subDistrict.label"
+                        subLabel="pages.register.detail.address.information.input.subDistrict.sublabel"
+                        [control]="formGroup.controls['subDistrictName']"
+                        [isSubmit]="isSubmit" [isCreated]="isCreated"
+                        [input]="subDistrictTypeaheadBase"
+                        [isRequired]="true"
+                        (onSelectChanged)="subDistrictChange($event)"
+                      ></app-standard-subdistrict>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+    </form>
+    <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputAddressInformation2Config">
+    </app-standard-form-card>
+    <div nz-col [nzSpan]="24" class="section-title">
+      {{contactTitle}}
+    </div>
+    <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputContactInformationConfig">
+    </app-standard-form-card>
+}
+@if(step == 3){
+<form nz-form autocomplete="off" [formGroup]="attachForm" novalidate [nzLayout]="'vertical'">
+  <div class="row" formArrayName="attachment">
+      @for (doc of document; track $index) {
+      <div nz-row [nzGutter]="16">
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-form-item>
+            <nz-form-label nzFor="cmn-street">
+              {{doc.nameEn}}&nbsp;<strong class="text-danger">*</strong>
+            </nz-form-label>
+            <nz-form-control>
+              <div class="input-group">
+                <input [ngClass]="{ 'is-invalid': attachment.at($index).errors, 'is-valid': !attachment.at($index).errors }"
+                  class="form-control form-control-sm bg-transparent card-control-value" type="text" placeholder="Choose file..."
+                  name="regis-attachment-{{$index}}" id="regis-attachment-{{$index}}" [formControlName]="$index" readonly (click)="attachFile.click();">
+                <div class="input-group-append">
+                  <button class="btn btn-sm btn-outline-secondary" type="button"
+                    (click)="attachFile.click();">Browse</button>
+                </div>
+              </div>
+              @if(attachment.at($index).errors && (attachment.at($index).dirty || attachment.at($index).touched || isSubmit)){
+                <div class="invalid-tooltip inherit-attachment">
+                <span>
+                  {{doc.nameEn}} is required.
+                </span>
+              </div>
+              }
+              <input #attachFile name="regis-file-attachment-{{$index}}" id="regisfile--attachment-{{$index}}"
+                (change)="selectedFile($event, $index)" accept="application/pdf, .png, .jpg, .jpeg" 
+                class="custom-file-input form-control-sm bg-transparent card-control-value visibility-hidden" type="file">
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      }
+  </div>
+</form>
+}
+@if(step == 4){
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ i18n.registerDetail.userTitle | translate }}
+  </div>
+  <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputUserInformationConfig">
+  </app-standard-form-card>
+  <div nz-col [nzSpan]="24" class="section-title">
+    {{ i18n.registerDetail.loginTitle | translate }}
+  </div>
+  <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputLoginInformationConfig">
+  </app-standard-form-card>
+}
+
+
+<div class="steps-action">
+
+  <div class="d-flex flex-wrap gap-6 align-items-center">
+    <div>
+      <div class="text-center">
+        @if(step == 1 && pageType === "add"){
+          <button title="{{ i18n.buttons.backToLogin | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
+          (click)="backToLogin()">
+          {{ i18n.buttons.backToLogin | translate}}
+          </button>
+          &nbsp;
+        }
+        @if(step > 1 || pageType === "edit"){
+          <button title="{{ i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
+          (click)="back()">
+          {{ i18n.buttons.back | translate}}
+          </button>
+          &nbsp;
+        }
+        @if(step !== 4){
+          <button title="{{ i18n.buttons.next | translate}}" type="button" id="umnc-back-btn" class="btn btn-primary"
+          (click)="next()">
+            <span>{{ i18n.buttons.next | translate}}</span>
+          </button>
+          &nbsp;
+        }@else {
+          <button title="{{ i18n.buttons.submit | translate}}" type="button" id="umnc-back-btn" class="btn btn-secondary"
+          (click)="submit()">
+            <span>{{ i18n.buttons.submit | translate}}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>

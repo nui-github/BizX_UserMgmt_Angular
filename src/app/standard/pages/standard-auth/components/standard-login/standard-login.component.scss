@@ -1,0 +1,21 @@
+// .app-logo {
+//     width: 100% !important;
+//     max-width: 300px !important;
+//     height: auto !important;
+// }
+
+.logo-container {
+  width: 100%;
+  justify-content: center; /* Center align the content horizontally */
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Aligns the text elements to the left */
+}
+
+.text-icon {
+  font-size: 32px;
+  color: #2A3547;
+}
