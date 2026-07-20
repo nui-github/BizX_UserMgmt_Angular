@@ -41,4 +41,8 @@ export const authMockHandlers: Record<string, (body: any) => any> = {
   'users/login': login,
   'users/getsession': login,
   'users/logout': () => mockSuccess(undefined),
+  // Always succeed without leaking whether the email exists — mirrors real security practice.
+  'users/forgotpassword': () => mockSuccess(undefined),
+  'users/forgotpasswordcheck': (body) => (body?.code ? mockSuccess({ username: 'admin' }) : mockFail('Invalid or expired code')),
+  'users/forgotpasswordchange': () => mockSuccess(undefined),
 };

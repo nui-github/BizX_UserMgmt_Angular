@@ -26,6 +26,10 @@ import { menusMockHandlers } from './handlers/menus.mock-handler';
 import { permissionsMockHandlers } from './handlers/permissions.mock-handler';
 import { companiesMockHandlers } from './handlers/companies.mock-handler';
 import { companyTypesMockHandlers } from './handlers/company-types.mock-handler';
+import { configMockHandlers } from './handlers/config.mock-handler';
+import { statusMockHandlers } from './handlers/status.mock-handler';
+import { subdistrictMockHandlers } from './handlers/subdistrict.mock-handler';
+import { registerMockHandlers } from './handlers/register.mock-handler';
 
 const MOCK_HANDLERS: Record<string, (body: any) => any> = {
   ...authMockHandlers,
@@ -36,6 +40,10 @@ const MOCK_HANDLERS: Record<string, (body: any) => any> = {
   ...permissionsMockHandlers,
   ...companiesMockHandlers,
   ...companyTypesMockHandlers,
+  ...configMockHandlers,
+  ...statusMockHandlers,
+  ...subdistrictMockHandlers,
+  ...registerMockHandlers,
   // Notification bell — stubbed empty, not backed by mock data yet.
   'users/notify/count-notification': () => mockSuccess(0),
   'users/notify/get-notification': () => mockSuccess([]),
@@ -44,7 +52,7 @@ const MOCK_HANDLERS: Record<string, (body: any) => any> = {
 };
 
 export const mockApiInterceptor: HttpInterceptorFn = (req, next) => {
-  if (!MOCK_CONFIG.enabled) return next(req);
+  if (!MOCK_CONFIG.enabled || !/^\/?api\//.test(req.url)) return next(req);
 
   const path = req.url.replace(/^\/?api\//, '');
   const handler = MOCK_HANDLERS[path];

@@ -48,5 +48,4 @@ export const usersMockHandlers: Record<string, (body: any) => any> = {
   'users/resetpassword': () => mockSuccess(undefined),
   'users/changepassword': () => mockSuccess(undefined),
   'users/changepasswordinformation': () => mockSuccess(undefined),
-  'users/approveregister': (body) => mockSuccess(store.patch(body?.uid, { approve: true, approvalId: '' })),
 };
