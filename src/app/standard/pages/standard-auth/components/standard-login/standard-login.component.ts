@@ -5,6 +5,7 @@ import { StandardLoginForm } from '../../models/standard-auth.model';
 import { StandardConfGlobalService } from '../../../../core/services/standard-conf-global.service';
 import { CommonModule } from '@angular/common';
 import { StandardLoginFormComponent } from '../../../../shared/abstracts/components/standard-login-form/standard-login-form.component';
+import { MOCK_CONFIG } from '../../../../core/mock/mock.config';
 
 @Component({
   selector: 'app-standard-login',
@@ -19,8 +20,9 @@ export class StandardLoginComponent extends StandardLoginFormComponent {
 
   constructor(public confGlobalService: StandardConfGlobalService) {
     super();
-    this.username = new FormControl(null, Validators.required);
-    this.password = new FormControl(null, Validators.required);
+    // Prefilled with a mock account for convenience while the mock API layer is on — see core/mock/.
+    this.username = new FormControl(MOCK_CONFIG.enabled ? 'admin' : null, Validators.required);
+    this.password = new FormControl(MOCK_CONFIG.enabled ? 'mock1234' : null, Validators.required);
     this.remember = new FormControl(false);
 
     this.formGroup = new FormGroup<StandardLoginForm>({
