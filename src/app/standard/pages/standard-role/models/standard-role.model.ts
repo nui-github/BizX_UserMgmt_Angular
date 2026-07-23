@@ -5,7 +5,6 @@ export class StandardRole {
 
 export class Role {
   id: number | null = null;
-  cpid: string | null = null;
   name: string | null = null;
   rolemenu: RoleMenu[] = [];
   rolepermission: RolePerm[] = [];
@@ -52,7 +51,6 @@ export class RoleMenu {
 }
 
 export class RoleCreateForm {
-  public cpid: FormControl<string | null>;
   public searchPermission: FormControl<string | null>;
   public name: FormControl<string | null>;
   public menus: FormArray<FormControl<boolean | null>>;
@@ -60,7 +58,6 @@ export class RoleCreateForm {
   public roleMenus: FormArray<FormControl<boolean | null>>;
 
   constructor(){
-    this.cpid = new FormControl(null);
     this.name = new FormControl(null, Validators.required);
     this.searchPermission = new FormControl(null);
     this.menus = new FormArray<FormControl<boolean | null>>([]);

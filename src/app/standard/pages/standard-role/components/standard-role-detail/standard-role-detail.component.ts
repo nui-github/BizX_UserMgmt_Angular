@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -9,11 +9,9 @@ import { StandardFormCardComponent, StandardFormCardInputConfig } from '../../..
 import { StandardFormComponent } from '../../../../shared/abstracts/components/standard-form/standard-form.component';
 import { IRole, Role, RoleCreateForm, RoleMenu, RoleMenuSearch, RolePerm, RolePermSearch } from '../../models/standard-role.model';
 import { StandardRoleService } from '../../services/standard-role.service';
-import { ICompany, SearchCompany } from '../../../standard-company/models/standard-company.model';
 import { AlertService } from '../../../../core/services/alert.service';
 import { StandardAppPermissionService } from '../../../../core/services/standard-app-permission.service';
-import { StandardCompanyService } from '../../../standard-company/services/standard-company.service';
-import { IMenu, MenuCompanyType } from '../../../standard-menu/models/standard-menu.model';
+import { IMenu } from '../../../standard-menu/models/standard-menu.model';
 import { StandardMenuService } from '../../../standard-menu/services/standard-menu.service';
 import { StandardFilterPipe } from '../../../../filter/filter.pipe';
 import { StandardPermissionService } from '../../../standard-permission/services/standard-permission.service';
@@ -44,16 +42,13 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
   public fetchDataService: StandardRoleService = inject(StandardRoleService);
   public formGroup: FormGroup<RoleCreateForm>;
   public formControl: RoleCreateForm = new RoleCreateForm();
-  private searchCompany: SearchCompany = new SearchCompany();
   private searchPerm: StandardPermissionSearch = new StandardPermissionSearch();
   private searchRoleMenu: RoleMenuSearch = new RoleMenuSearch();
   private searchRolePerm: RolePermSearch = new RolePermSearch();
-  public responseItemsCompany: ICompany[] = [];
   public menuLabel:string = "pages.role.input.menu.label";
   public menuSubLabel:string = "pages.role.input.menu.sublabel";
   public permissionLabel:string = "pages.role.input.permission.label";
   public permissionSubLabel:string = "pages.role.input.permission.sublabel";
-  private menuCompanyType: MenuCompanyType = new MenuCompanyType();
   public isLoadingMenu: boolean = false;
   public isLoadingPerm: boolean = false;
 
@@ -64,15 +59,6 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
   public role: any = {};
 
   public inputConfig: StandardFormCardInputConfig[] = [
-    {
-      id: "rmnc-role-company",
-      name: "rmnc-role-company",
-      formControlName: "cpid",
-      label: "pages.role.select.cpid.label",
-      sublabel: "pages.role.select.cpid.sublabel",
-      type: 'select',
-      showInput: true,
-    },
     {
         id: "rmnc-role-name",
         name: "rmnc-role-name",
@@ -86,7 +72,6 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
 
   constructor(
     public permission: StandardAppPermissionService,
-    private companyService:StandardCompanyService,
     // private alertService: AlertService,
     private menuService: StandardMenuService,
     private permService: StandardPermissionService,
@@ -101,25 +86,16 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
       this.formGroup.disable();
     }
 
-    this.formGroup.controls.cpid?.valueChanges.subscribe((cpid) => {
-      if(cpid){
-          this.menuCompanyType.cpid = cpid;
-          this.getAllMenu();
-      }
-    })
     if(this.pageType === "add"){
       this.getPermissionList(this.searchPerm);
-    }
-
-    if(this.permissions.checkIsSystemAdmin()){
-      this.formGroup.controls.cpid.setValidators(Validators.required);
-      this.formGroup.controls.cpid.updateValueAndValidity();
     }
   }
 
 
   override async ngOnInit(): Promise<void> {
-    await this.getCompanyList(this.searchCompany);
+    if (this.pageType === "add") {
+      await this.getAllMenu();
+    }
     super.ngOnInit();
   }
 
@@ -187,24 +163,6 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
         }
       });
     });
-  }
-
-  getCompanyList(search: SearchCompany) {
-    this.companyService
-      .getListCompany(1, 999999, search)
-      .subscribe({
-        next: (res) => {
-          this.responseItemsCompany = (res && res.data && res.data.data) || [];
-          this.inputConfig.filter(e => e.formControlName == "cpid").map(map =>{
-            map.options = this.responseItemsCompany.map(company => this.mapToCompanyList(company))
-          })
-        },
-        error: (err) => {
-        }
-      });
-  }
-  mapToCompanyList(item: ICompany) {
-    return { value: item.cpid, label: item.name };
   }
 
   getAllMenu() {
@@ -392,7 +350,6 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
     this.isLoading = true;
     let role: Role = new Role();
 
-    role.cpid = fRoleValue.cpid;
     role.name = fRoleValue.name;
     role.rolemenu = this.getSelectMenu(fRoleValue.menus);
     // role.rolepermission = this.getSelectPerm(fRoleValue["fPermArrs"]);
@@ -421,7 +378,6 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
     let role: Role = new Role();
 
     role.id = this.id ? +this.id: null;
-    role.cpid = fRoleValue.cpid;
     role.name = fRoleValue.name;
     role.rolemenu = this.getSelectMenu(fRoleValue.menus);
     // role.rolepermission = this.getSelectPerm(fRoleValue["fPermArrs"]);
