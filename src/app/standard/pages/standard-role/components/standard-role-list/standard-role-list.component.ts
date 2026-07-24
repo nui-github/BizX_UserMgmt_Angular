@@ -18,8 +18,6 @@ import { StandardShowingPageComponent } from '../../../../shared/components/stan
 import { IRole, RoleSearch } from '../../models/standard-role.model';
 import { StandardTrackingComponent } from '../../../../shared/abstracts/components/standard-tracking/standard-tracking.component';
 import { StandardRoleService } from '../../services/standard-role.service';
-import { ICompany, SearchCompany } from '../../../standard-company/models/standard-company.model';
-import { StandardCompanyService } from '../../../standard-company/services/standard-company.service';
 import { AlertService } from '../../../../core/services/alert.service';
 import { StandardAppPermissionService } from '../../../../core/services/standard-app-permission.service';
 import { TranslateModule } from '@ngx-translate/core';
@@ -27,7 +25,6 @@ import { i18n } from '../../../../shared/models/standard-i18n.model';
 
 export type RoleSearchForm = {
   id: FormControl<string | null>;
-  cpid: FormControl<string | null>;
   name: FormControl<string | null>;
 }
 
@@ -65,10 +62,7 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
   public override responseItems: IRole[] | undefined;
   public override key: string = "id";
   public override absoluteUrl: string;
-  public responseItemsCompany: ICompany[] = [];
-  public colSpan: number = 20;
 
-  private searchCompany: SearchCompany = new SearchCompany();
   public  swalConfigs: any = {
     focusCancel: true,
     showCancelButton: true,
@@ -76,29 +70,6 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
     confirmButtonColor: "#dc3545",
     cancelButtonText: "No",
   };
-
-  public inputAdminConfig: StandardFormCardInputConfig[] = [
-    {
-      id: "rmnl-search-cpid",
-      name: "rmnl-search-cpid",
-      formControlName: "cpid",
-      label: "pages.role.select.cpid.label",
-      sublabel: "pages.role.select.cpid.sublabel",
-      type: 'select',
-      showInput: true,
-      placeholder: "fields.placeholder.search",
-    },
-    {
-      id: "rmnl-search-name",
-      name: "rmnl-search-name",
-      formControlName: "name",
-      label: "pages.role.input.name.label",
-      sublabel: "pages.role.input.name.sublabel",
-      type: 'text',
-      showInput: true,
-      placeholder: "fields.placeholder.search"
-    },
-  ]
 
   public inputConfig: StandardFormCardInputConfig[] = [
     {
@@ -116,7 +87,6 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
   constructor(
     private fb: FormBuilder,
     public location: Location,
-    public companyService:StandardCompanyService,
     private alertService: AlertService,
     public router: Router,
     public permission: StandardAppPermissionService,
@@ -125,36 +95,9 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
     this.absoluteUrl = this.location.path(true);
     this.searchForm =this.fb.group<RoleSearchForm>({
       id: this.fb.control(null),
-      cpid: this.fb.control(null),
       name: this.fb.control(null),
     })
 
-  }
-
-  override async ngOnInit(): Promise<void> {
-    if(this.permission.checkIsSystemAdmin()){
-      this.colSpan = 8;
-      await this.getCompanyList(this.searchCompany);
-    }
-    super.ngOnInit();
-  }
-
-  getCompanyList(search: SearchCompany) {
-    this.companyService
-      .getListCompany(1, 999999, search)
-      .subscribe({
-        next: (res) => {
-          this.responseItemsCompany = (res && res.data && res.data.data) || [];
-          this.inputAdminConfig.filter(e => e.formControlName == "cpid").map(map =>{
-            map.options = this.responseItemsCompany.map(company => this.mapToCompanyList(company))
-          })
-        },
-        error: (err) => {
-        }
-      });
-  }
-  mapToCompanyList(item: ICompany) {
-    return { value: item.cpid, label: item.name };
   }
 
 }
