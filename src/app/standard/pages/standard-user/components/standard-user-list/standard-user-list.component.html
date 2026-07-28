@@ -77,7 +77,7 @@
                         <div nz-col [nzSpan]="24" [nzLg]="8" [nzMd]="12" class="mt-2 p-md-3">
                           <div nz-flex [nzVertical]="true">
                             <label for="title-card-{{$index}}" class="form-label">{{i18n.user.cardTitleGroup | translate}}&nbsp;</label>
-                            <span id="umnl-group-name{{$index}}" class="form-label-small text-wrap">{{user.group}}</span>
+                            <span id="umnl-group-name{{$index}}" class="form-label-small text-wrap">{{user.group}} ({{ groupCount(user) }} {{ 'pages.user.list.card.gid.count' | translate }})</span>
                           </div>
                         </div>
                       </div>

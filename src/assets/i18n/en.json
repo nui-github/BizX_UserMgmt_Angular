@@ -50,6 +50,7 @@
   "pages.user.list.card.email.title": "Email",
   "pages.user.list.card.cpid.title": "Company Name",
   "pages.user.list.card.gid.title": "Group",
+  "pages.user.list.card.gid.count": "groups",
   "pages.user.list.card.status.title": "Status",
 
   "pages.user.detail.select.cpid.label": "Company Name",

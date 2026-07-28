@@ -50,6 +50,7 @@
   "pages.user.list.card.email.title": "อีเมล",
   "pages.user.list.card.cpid.title": "ชื่อบริษัท",
   "pages.user.list.card.gid.title": "กลุ่ม",
+  "pages.user.list.card.gid.count": "กลุ่ม",
   "pages.user.list.card.status.title": "สถานะ",
 
   "pages.user.detail.select.cpid.label": "บริษัท",

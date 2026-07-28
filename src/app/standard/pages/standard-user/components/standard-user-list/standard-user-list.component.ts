@@ -202,6 +202,10 @@ export class StandardUserListComponent extends StandardTrackingComponent<SearchU
     return { value: item.cpid, label: item.name };
   }
 
+  groupCount(user: IUser): number {
+    return user.groupRoles?.length || (user.gid ? 1 : 0);
+  }
+
   eventOnChangeUserStatus(user: IUser) {
     this.alertService.alertMessageOption(
       {
