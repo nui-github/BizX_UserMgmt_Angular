@@ -8,7 +8,10 @@ const store = new MockStore<IRole>(MOCK_ROLES, 'id');
 
 export const rolesMockHandlers: Record<string, (body: any) => any> = {
   'users/getlistrole': (body) => {
-    const list = store.search((r) => !body?.name || r.name?.toLowerCase().includes(String(body.name).toLowerCase()));
+    const list = store.search((r) =>
+      (!body?.name || !!r.name?.toLowerCase().includes(String(body.name).toLowerCase())) &&
+      (!body?.cpid || r.cpid === body.cpid)
+    );
     return mockSuccess(mockPage(list, body?.pageNum, body?.pageSize));
   },
   'users/getrole': (body) => {

@@ -1,5 +1,6 @@
 <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputConfig">
 </app-standard-form-card>
+@if(formGroup.controls['cpid'].value){
   <form nz-form [formGroup]="formGroup" autocomplete="off" novalidate [nzLayout]="'vertical'" >
     <div nz-row [nzGutter]="16" >
       <div nz-col [nzSpan]="24" [nzMd]="12">
@@ -73,6 +74,7 @@
       </div>
     </div>
   </form>
+}
 <div class="d-flex flex-wrap gap-6 align-items-center">
   <div>
     <div class="text-center">

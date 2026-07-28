@@ -4,13 +4,18 @@ import { mockFail, mockSuccess } from '../mock-response.helper';
 
 const MOCK_PASSWORD = 'mock1234';
 
+// Codes must match the literal APP_PERMISSION['...'] strings checked across the app (see permissions.mock-data.ts).
 const PERMISSIONS_BY_GROUP: Record<string, string[]> = {
   'mock-gid-001': ['SYS_ADMIN'],
-  'mock-gid-002': ['USER.VIEW', 'USER.CREATE', 'USER.UPDATE', 'GROUP.VIEW'],
-  'mock-gid-003': ['USER.VIEW', 'COMPANY.VIEW'],
-  'mock-gid-004': ['USER.VIEW'],
-  // Company admin demo persona: full management rights, scoped to its own company — no SYS_ADMIN, no COMPANY.MANAGE/MENU.MANAGE/PERMISSION.MANAGE (platform-wide).
-  'mock-gid-005': ['USER.VIEW', 'USER.CREATE', 'USER.UPDATE', 'USER.DELETE', 'GROUP.VIEW', 'GROUP.MANAGE', 'ROLE.MANAGE'],
+  'mock-gid-002': ['USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_APPROVAL', 'USER_UNLOCK', 'USER_RESET_PASSWORD', 'GROUP_VIEW'],
+  'mock-gid-003': ['USER_VIEW', 'COMPANY_VIEW'],
+  'mock-gid-004': ['USER_VIEW'],
+  // Company admin demo persona: full management rights, scoped to its own company — no SYS_ADMIN, no COMPANY_*/MENU_*/PERMISSION_*/REGISTER_* (platform-wide).
+  'mock-gid-005': [
+    'USER_VIEW', 'USER_CREATE', 'USER_EDIT', 'USER_APPROVAL', 'USER_CHANGE_STATUS', 'USER_UNLOCK', 'USER_RESET_PASSWORD',
+    'GROUP_VIEW', 'GROUP_CREATE', 'GROUP_EDIT',
+    'ROLE_VIEW', 'ROLE_ADD', 'ROLE_CREATE', 'ROLE_EDIT',
+  ],
 };
 
 function login(body: any) {
