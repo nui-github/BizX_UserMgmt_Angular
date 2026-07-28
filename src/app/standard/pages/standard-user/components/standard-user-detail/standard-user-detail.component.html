@@ -1,21 +1,111 @@
 <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [isCreated]="isCreated" [inputConfig]="inputConfig">
+</app-standard-form-card>
 
-  <ng-template #submitTemplate>
-    <div class="d-flex flex-wrap gap-6 align-items-center">
-      <div>
-        <div class="text-center">
+<div class="mt-8 pt-6 border-top">
+  <h5 class="mb-1">{{ groupRoleTitle | translate }}</h5>
+  <p class="card-subtitle mb-4">{{ groupRoleSubtitle | translate }}</p>
+
+  @if (assignedGroupRoles.length) {
+    <div class="d-flex flex-column gap-2 mb-5">
+      @for (item of assignedGroupRoles; track item.gid + '-' + item.roleId) {
+        <div class="d-flex align-items-center justify-content-between gap-3 px-4 py-3 border rounded-2 bg-body-tertiary">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <span id="umnc-grouprole-group-{{$index}}" class="fw-semibold">{{ groupName(item.gid) }}</span>
+            <span class="text-body-secondary">/</span>
+            <span id="umnc-grouprole-role-{{$index}}">{{ roleName(item.roleId) }}</span>
+          </div>
           @if (hasPermissions) {
-          <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="save()">
-            {{i18n.buttons.save | translate}}
-          </button>
+            <button type="button" id="umnc-grouprole-remove-{{$index}}" class="btn btn-outline-danger btn-icon btn-sm" (click)="removeAssignment($index)">
+              <i nz-icon nzType="delete"></i>
+            </button>
           }
-          <button title="{{i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
-            (click)="onClosed()">
-            {{i18n.buttons.back | translate}}
-          </button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (hasPermissions) {
+    <form nz-form [nzLayout]="'vertical'">
+    @for (row of entryRows.controls; track $index) {
+      <div [formGroup]="row" nz-row nzAlign="bottom" [nzGutter]="16" class="mb-4">
+        <div nz-col [nzSpan]="24" [nzMd]="9">
+          <nz-form-item>
+            <nz-form-label nzFor="umnc-grouprole-gid-{{$index}}">
+              <span>
+                {{ 'pages.user.detail.select.gid.label' | translate }}
+                <br>
+                <span class="form-label-small">{{ 'pages.user.detail.select.gid.sublabel' | translate }}</span>
+              </span>
+            </nz-form-label>
+            <nz-form-control>
+              <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
+                id="umnc-grouprole-gid-{{$index}}" formControlName="gid" nzPlaceHolder="{{ 'fields.select' | translate }}">
+                @for (g of responseItemsGroup; track g.gid) {
+                  <nz-option [nzValue]="g.gid" [nzLabel]="g.name"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="24" [nzMd]="9">
+          <nz-form-item>
+            <nz-form-label nzFor="umnc-grouprole-roleid-{{$index}}">
+              <span>
+                {{ 'pages.user.detail.groupRole.role.label' | translate }}
+                <br>
+                <span class="form-label-small">{{ 'pages.user.detail.groupRole.role.sublabel' | translate }}</span>
+              </span>
+            </nz-form-label>
+            <nz-form-control>
+              <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
+                id="umnc-grouprole-roleid-{{$index}}" formControlName="roleId" nzPlaceHolder="{{ 'fields.select' | translate }}">
+                @for (r of allRoles; track r.id) {
+                  <nz-option [nzValue]="r.id" [nzLabel]="r.name"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="24" [nzMd]="6">
+          <nz-form-item>
+            <nz-form-label class="invisible" aria-hidden="true">
+              <span>&nbsp;<br><span class="form-label-small">&nbsp;</span></span>
+            </nz-form-label>
+            <nz-form-control>
+              <div class="d-flex gap-2">
+                <button type="button" id="umnc-grouprole-add-{{$index}}" class="btn btn-primary flex-fill" (click)="addAssignment($index)">
+                  {{ i18n.buttons.save | translate }}
+                </button>
+                @if (entryRows.length > 1) {
+                  <button type="button" id="umnc-grouprole-removerow-{{$index}}" class="btn btn-outline-secondary btn-icon" (click)="removeEntryRow($index)">
+                    <i nz-icon nzType="close"></i>
+                  </button>
+                }
+              </div>
+            </nz-form-control>
+          </nz-form-item>
         </div>
       </div>
-    </div>
-  </ng-template>
+    }
+    </form>
+    <button type="button" id="umnc-grouprole-addrow-btn" class="btn btn-outline-primary btn-sm" (click)="addEntryRow()">
+      <i nz-icon nzType="plus"></i> {{ i18n.buttons.add | translate }}
+    </button>
+  }
+</div>
 
-</app-standard-form-card>
+<div class="d-flex flex-wrap gap-6 align-items-center mt-6">
+  <div>
+    <div class="text-center">
+      @if (hasPermissions) {
+      <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="save()">
+        {{i18n.buttons.save | translate}}
+      </button>
+      }
+      <button title="{{i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
+        (click)="onClosed()">
+        {{i18n.buttons.back | translate}}
+      </button>
+    </div>
+  </div>
+</div>

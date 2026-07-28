@@ -27,4 +27,10 @@ export const MOCK_GROUPS: IGroup[] = [
     createTime: '2024-03-08 09:00:00', lastUpdateTime: '2024-03-08 09:00:00',
     approval: false, approvalId: '',
   },
+  {
+    gid: 'mock-gid-005', cpid: 'mock-cpid-001', companyName: 'บริษัท เน็ตเบย์ กรุ๊ป จำกัด',
+    name: 'COMPANY ADMIN', limitUser: -1, isActive: true,
+    createTime: '2026-07-28 00:00:00', lastUpdateTime: '2026-07-28 00:00:00',
+    approval: false, approvalId: '',
+  },
 ];

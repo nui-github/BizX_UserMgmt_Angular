@@ -1,25 +1,37 @@
 import { Component, inject } from '@angular/core';
-import { IUser,StandardUserForm } from '../../models/standard-user.model';
+import { IUser, IUserGroupRole, StandardUserForm } from '../../models/standard-user.model';
 import { StandardFormComponent } from '../../../../shared/abstracts/components/standard-form/standard-form.component';
 import { StandardUserService } from '../../services/standard-user.service';
-import { AbstractControlOptions, FormGroup } from '@angular/forms';
+import { AbstractControlOptions, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { StandardFormCardComponent, StandardFormCardInputConfig } from '../../../../shared/components/standard-form-card/standard-form-card.component';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzFormModule } from 'ng-zorro-antd/form';
 import { StandardGroupService } from '../../../standard-group/services/standard-group.service';
 import { StandardCompanyService } from '../../../standard-company/services/standard-company.service';
 import { ICompany, SearchCompany } from '../../../standard-company/models/standard-company.model';
 import { SearchGroup, StandardGroup } from '../../../standard-group/models/standard-group.model';
+import { StandardRoleService } from '../../../standard-role/services/standard-role.service';
+import { IRole, RoleSearch } from '../../../standard-role/models/standard-role.model';
 import { MustMatch } from '../../../../shared/validators/standard-mismatch.validator';
 import { ActivatedRoute } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { i18n } from '../../../../shared/models/standard-i18n.model';
+
+type GroupRoleEntryRow = FormGroup<{ gid: FormControl<string | null>; roleId: FormControl<number | null>; }>;
+
 @Component({
   selector: 'app-standard-user-detail',
   standalone: true,
   imports: [
     NzGridModule,
     NzCardModule,
+    NzIconModule,
+    NzSelectModule,
+    NzFormModule,
+    ReactiveFormsModule,
     StandardFormCardComponent,
     TranslateModule
   ],
@@ -38,25 +50,15 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
   public formControls: StandardUserForm = new StandardUserForm();
   private maskUp: string = "**********";
   public user: IUser | null = null;
+
+  // "Add role for user" — see IUserGroupRole: mock-only, no tab_user_group_role table in the real schema.
+  public allRoles: IRole[] = [];
+  public assignedGroupRoles: IUserGroupRole[] = [];
+  public entryRows: FormArray<GroupRoleEntryRow> = new FormArray<GroupRoleEntryRow>([]);
+  public groupRoleTitle = "pages.user.detail.groupRole.title";
+  public groupRoleSubtitle = "pages.user.detail.groupRole.subtitle";
+
   public inputConfig: StandardFormCardInputConfig[] = [
-    {
-      id: "umnc-company",
-      name: "umnc-company",
-      formControlName: "cpid",
-      label: "pages.user.detail.select.cpid.label",
-      sublabel: "pages.user.detail.select.cpid.sublabel",
-      type: 'select',
-      showInput: true,
-    },
-    {
-      id: "umnc-group",
-      name: "umnc-group",
-      formControlName: "gid",
-      label: "pages.user.detail.select.gid.label",
-      sublabel: "pages.user.detail.select.gid.sublabel",
-      type: 'select',
-      showInput: true,
-    },
     {
       id: "umnc-username",
       name: "umnc-username",
@@ -153,6 +155,7 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
   constructor(
     public companyService:StandardCompanyService,
     public groupService:StandardGroupService,
+    private roleService: StandardRoleService,
     private route: ActivatedRoute,
   ) {
     super();
@@ -165,18 +168,32 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
 
     } as AbstractControlOptions);
     this.hasPermissions = this.permissions.checkPermissionList([this.APP_PERMISSION['USER_CREATE'], this.APP_PERMISSION['USER_EDIT']]);
-    this.formGroup.controls.cpid?.valueChanges.subscribe((company) => {
-
-      if(!company){
-        this.formGroup.controls.gid.setValue("");
-      }
-      this.eventOnCompanyChange();
-    });
+    this.formGroup.controls.cpid?.valueChanges.subscribe(() => this.eventOnCompanyChange());
     this.route.paramMap.subscribe((params) => {
       this.id = params.get("id") || null;
     });
+
+    this.addEntryRow();
+
+    if (this.pageType === "add") {
+      // Company is no longer picked here — new users belong to the creating admin's own company.
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+      this.formGroup.controls.cpid.setValue(currentUser.cpid ?? null);
+    } else {
+      // Existing user already belongs to a company — show it, but it can't be reassigned here.
+      this.inputConfig.unshift({
+        id: "umnc-company",
+        name: "umnc-company",
+        formControlName: "cpid",
+        label: "pages.user.detail.select.cpid.label",
+        sublabel: "pages.user.detail.select.cpid.sublabel",
+        type: 'select',
+        showInput: true,
+      });
+      this.formGroup.controls.cpid.disable();
+    }
+
     if(this.pageType == 'edit'){
-      this.eventOnCompanyChange();
       this.formControls.uid.setValue(this.id);
       this.formControls.password.setValue(this.maskUp);
       this.formControls.username.disable();
@@ -194,6 +211,12 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
 
   override ngOnInit(): void {
     this.getCompanyList(this.searchCompany);
+    this.roleService.getRoleList(1, 9999, new RoleSearch()).subscribe({
+      next: (res) => {
+        this.allRoles = (res && res.data && res.data.data) || [];
+      },
+      error: (err) => console.log(err)
+    });
     super.ngOnInit();
     if (this.pageType == "add") {
       this.successMessage = this.i18n.user.alertMessageCreateSuccess;
@@ -202,6 +225,22 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       this.successMessage = this.i18n.user.alertMessageUpdateSuccess;
       this.failureMessage = this.i18n.user.alertMessageUpdateFailure
     }
+  }
+
+  override fetchData(id: string | number | null | undefined): void {
+    this.isLoading = true;
+    this.fetchDataService.getById(id as string).subscribe({
+      next: (res) => {
+        this.isLoading = false;
+        this.model = res ? res.data : {} as IUser;
+        this.patchFormControls(res.data);
+        this.assignedGroupRoles = [...(res.data?.groupRoles ?? [])];
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.log(err);
+      }
+    });
   }
 
   getCompanyList(search: SearchCompany) {
@@ -220,13 +259,9 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       });
   }
   getGroupList(search: SearchGroup){
-    this.groupService.getGroupList(1, 10, search).subscribe({
+    this.groupService.getGroupList(1, 999999, search).subscribe({
       next: (res) => {
-        console.log(res);
         this.responseItemsGroup = res.data && res.data.data ? res.data.data : [];
-        this.inputConfig.filter(p => p.formControlName == "gid").map(map => {
-          map.options = this.responseItemsGroup.map(group => this.mapMenuToGroupList(group))
-        })
       },
       error: (err) => {
         console.log(err);
@@ -248,6 +283,56 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       this.getGroupList(this.groupSearch);
     }
   }
+
+  addEntryRow() {
+    this.entryRows.push(new FormGroup({
+      gid: new FormControl<string | null>(null),
+      roleId: new FormControl<number | null>(null),
+    }));
+  }
+
+  removeEntryRow(index: number) {
+    this.entryRows.removeAt(index);
+  }
+
+  addAssignment(index: number) {
+    const row = this.entryRows.at(index);
+    const gid = row.controls.gid.value;
+    const roleId = row.controls.roleId.value;
+    if (!gid || !roleId) {
+      row.markAllAsTouched();
+      return;
+    }
+    if (this.assignedGroupRoles.some(a => a.gid === gid && a.roleId === roleId)) {
+      this.alertService.alertDefaultError('pages.user.detail.groupRole.duplicate.error');
+      return;
+    }
+    this.assignedGroupRoles = [...this.assignedGroupRoles, { gid, roleId }];
+    this.syncGroupRolesControl();
+    this.entryRows.removeAt(index);
+    if (this.entryRows.length === 0) {
+      this.addEntryRow();
+    }
+  }
+
+  removeAssignment(index: number) {
+    this.assignedGroupRoles = this.assignedGroupRoles.filter((_, i) => i !== index);
+    this.syncGroupRolesControl();
+  }
+
+  syncGroupRolesControl() {
+    this.formGroup.controls.groupRoles.setValue([...this.assignedGroupRoles]);
+    this.formGroup.controls.gid.setValue(this.assignedGroupRoles[0]?.gid ?? null);
+  }
+
+  groupName(gid: string): string {
+    return this.responseItemsGroup.find(g => g.gid === gid)?.name ?? gid;
+  }
+
+  roleName(roleId: number): string {
+    return this.allRoles.find(r => r.id === roleId)?.name ?? String(roleId);
+  }
+
   save(){
     this.formGroup.markAllAsTouched();
     this.formGroup.updateValueAndValidity();

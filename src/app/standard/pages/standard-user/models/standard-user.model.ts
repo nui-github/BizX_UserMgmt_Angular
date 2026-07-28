@@ -38,6 +38,11 @@ export class SearchUser implements ISearchUser {
   public username: string | null = null;
 }
 
+export interface IUserGroupRole {
+  gid: string;
+  roleId: number;
+}
+
 export interface IUser {
   uid: string;
   company: string;
@@ -54,6 +59,9 @@ export interface IUser {
   lock: boolean;
   approvalId: string;
   approve: boolean;
+  // NEW — no backend column yet (tab_users only has a single gid). Lets one user
+  // hold multiple group+role assignments; see standard-user-detail.component.ts.
+  groupRoles?: IUserGroupRole[];
 }
 
 export interface ISearchUser {
@@ -125,6 +133,7 @@ export class StandardUserForm{
   public employeecode: FormControl<string | null>;
   public department: FormControl<string | null>;
   public division: FormControl<string | null>;
+  public groupRoles: FormControl<IUserGroupRole[] | null>;
 
   constructor(){
     this.cpid = new FormControl(null, Validators.required);
@@ -160,6 +169,7 @@ export class StandardUserForm{
     this.employeecode = new FormControl(null);
     this.department = new FormControl(null);
     this.division = new FormControl(null);
+    this.groupRoles = new FormControl([]);
   }
 
 }
