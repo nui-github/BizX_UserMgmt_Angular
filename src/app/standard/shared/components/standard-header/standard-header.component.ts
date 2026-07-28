@@ -15,6 +15,7 @@ import { StandardNotificationComponent } from '../../../pages/standard-notificat
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateModule } from '@ngx-translate/core';
 import { EventToggleSidebar } from '../../models/standard-event-emitter.model';
+import { DEMO_ACCOUNTS, DemoAccountRole } from '../../../core/mock/demo-account.config';
 
 @Component({
   selector: 'app-header',
@@ -52,6 +53,10 @@ export class StandardHeaderComponent implements OnInit {
   public changePasswordMessage = "pages.standard.header.menu.profile.change.password";
   public logOutMessage = "pages.standard.header.menu.profile.logout";
 
+  // Demo-only account switcher — see core/mock/demo-account.config.ts.
+  public demoAccounts = DEMO_ACCOUNTS;
+  public isSwitchingAccount = false;
+
   constructor(private themeService: StandardThemeService,
     private authenService: StandardAuthService,
     private router: Router,
@@ -67,6 +72,23 @@ export class StandardHeaderComponent implements OnInit {
     }
 
     this.selectedTheme = this.themeService.selectedTheme;
+  }
+
+  get currentDemoRole(): DemoAccountRole {
+    return this.currentUser?.username === this.demoAccounts.platform.username ? 'platform' : 'company';
+  }
+
+  switchAccount(role: DemoAccountRole) {
+    if (role === this.currentDemoRole || this.isSwitchingAccount) return;
+    const account = this.demoAccounts[role];
+    this.isSwitchingAccount = true;
+    this.authenService.login(account.username, account.password).subscribe({
+      next: () => window.location.reload(),
+      error: () => {
+        this.isSwitchingAccount = false;
+        this.toastr.error('Switch account failed');
+      }
+    });
   }
 
   toggleSidebar() {

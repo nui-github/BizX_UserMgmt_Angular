@@ -133,6 +133,25 @@
                                   </p>
                                 </div>
                               </div>
+                              <div class="px-7 pt-6">
+                                <span class="fs-2 d-block text-body-secondary mb-2">Switch account (demo)</span>
+                                <div class="btn-group w-100" role="group">
+                                  <button type="button" class="btn btn-sm"
+                                    [class.btn-primary]="currentDemoRole === 'platform'"
+                                    [class.btn-outline-primary]="currentDemoRole !== 'platform'"
+                                    [disabled]="isSwitchingAccount"
+                                    (click)="switchAccount('platform')">
+                                    {{ demoAccounts.platform.label }}
+                                  </button>
+                                  <button type="button" class="btn btn-sm"
+                                    [class.btn-primary]="currentDemoRole === 'company'"
+                                    [class.btn-outline-primary]="currentDemoRole !== 'company'"
+                                    [disabled]="isSwitchingAccount"
+                                    (click)="switchAccount('company')">
+                                    {{ demoAccounts.company.label }}
+                                  </button>
+                                </div>
+                              </div>
                               <div class="message-body">
                                 <a href="javascript:void(0);" (click)="profileSetting()" class="py-8 px-7 mt-8 d-flex align-items-center">
                                   <span class="d-flex align-items-center justify-content-center text-bg-light rounded-1 p-6"><i class="ti ti-user-circle "></i></span>

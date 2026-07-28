@@ -6,6 +6,7 @@ import { StandardConfGlobalService } from '../../../../core/services/standard-co
 import { CommonModule } from '@angular/common';
 import { StandardLoginFormComponent } from '../../../../shared/abstracts/components/standard-login-form/standard-login-form.component';
 import { MOCK_CONFIG } from '../../../../core/mock/mock.config';
+import { DEFAULT_DEMO_ROLE, DEMO_ACCOUNTS } from '../../../../core/mock/demo-account.config';
 
 @Component({
   selector: 'app-standard-login',
@@ -21,8 +22,10 @@ export class StandardLoginComponent extends StandardLoginFormComponent {
   constructor(public confGlobalService: StandardConfGlobalService) {
     super();
     // Prefilled with a mock account for convenience while the mock API layer is on — see core/mock/.
-    this.username = new FormControl(MOCK_CONFIG.enabled ? 'admin' : null, Validators.required);
-    this.password = new FormControl(MOCK_CONFIG.enabled ? 'mock1234' : null, Validators.required);
+    // Defaults to the company-admin persona; use the profile menu's "switch account" to try platform admin.
+    const defaultDemoAccount = DEMO_ACCOUNTS[DEFAULT_DEMO_ROLE];
+    this.username = new FormControl(MOCK_CONFIG.enabled ? defaultDemoAccount.username : null, Validators.required);
+    this.password = new FormControl(MOCK_CONFIG.enabled ? defaultDemoAccount.password : null, Validators.required);
     this.remember = new FormControl(false);
 
     this.formGroup = new FormGroup<StandardLoginForm>({

@@ -9,6 +9,8 @@ const PERMISSIONS_BY_GROUP: Record<string, string[]> = {
   'mock-gid-002': ['USER.VIEW', 'USER.CREATE', 'USER.UPDATE', 'GROUP.VIEW'],
   'mock-gid-003': ['USER.VIEW', 'COMPANY.VIEW'],
   'mock-gid-004': ['USER.VIEW'],
+  // Company admin demo persona: full management rights, scoped to its own company — no SYS_ADMIN, no COMPANY.MANAGE/MENU.MANAGE/PERMISSION.MANAGE (platform-wide).
+  'mock-gid-005': ['USER.VIEW', 'USER.CREATE', 'USER.UPDATE', 'USER.DELETE', 'GROUP.VIEW', 'GROUP.MANAGE', 'ROLE.MANAGE'],
 };
 
 function login(body: any) {
