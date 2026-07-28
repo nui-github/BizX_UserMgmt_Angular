@@ -94,18 +94,14 @@
   }
 </div>
 
-<div class="d-flex flex-wrap gap-6 align-items-center mt-6">
-  <div>
-    <div class="text-center">
-      @if (hasPermissions) {
-      <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="save()">
-        {{i18n.buttons.save | translate}}
-      </button>
-      }
-      <button title="{{i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary ms-6"
-        (click)="onClosed()">
-        {{i18n.buttons.back | translate}}
-      </button>
-    </div>
-  </div>
+<div class="d-flex flex-wrap gap-6 align-items-center mt-8 pt-6 border-top">
+  @if (hasPermissions) {
+  <button title="{{i18n.buttons.save | translate}}" type="button" id="umnc-save-btn" class="btn btn-primary" (click)="save()">
+    {{i18n.buttons.save | translate}}
+  </button>
+  }
+  <button title="{{i18n.buttons.back | translate}}" type="button" id="umnc-back-btn" class="btn btn-outline-primary"
+    (click)="onClosed()">
+    {{i18n.buttons.back | translate}}
+  </button>
 </div>

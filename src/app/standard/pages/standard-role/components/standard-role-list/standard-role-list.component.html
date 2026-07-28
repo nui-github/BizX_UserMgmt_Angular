@@ -1,4 +1,4 @@
-<app-standard-form-card [formGroup]="searchForm" [inputConfig]="permission.checkIsSystemAdmin() ? inputAdminConfig : inputConfig" [amountOfInputPerRow]="2">
+<app-standard-form-card [formGroup]="searchForm" [inputConfig]="inputConfig" [amountOfInputPerRow]="2">
   <ng-template #submitTemplate>
     <div nz-row nzAlign="middle" class="d-flex flex-wrap gap-6 mb-3">
       <div nz-col>
@@ -31,15 +31,13 @@
                   <div nz-row>
                     <div nz-col [nzSpan]="24" [nzMd]="20">
                       <div nz-row>
-                          @if(permission.checkIsSystemAdmin()){
                           <div nz-col [nzSpan]="20" [nzMd]="10" class="mt-2 p-md-3">
                             <div nz-flex [nzVertical]="true">
                               <label for="title-card-{{$index}}" class="form-label">{{i18n.role.cardTitleCompanyName | translate}}</label>
                               <span id="rmnl-company-name{{$index}}" class="form-label-small text-wrap">{{role.company}}</span>
                             </div>
                           </div>
-                        }
-                          <div nz-col [nzSpan]="20" [nzMd]="permission.checkIsSystemAdmin() ? 10 : 20" class="mt-2 p-md-3">
+                          <div nz-col [nzSpan]="20" [nzMd]="10" class="mt-2 p-md-3">
                             <div nz-flex [nzVertical]="true">
                               <label for="title-card-{{$index}}" class="form-label">{{i18n.role.cardTitleName | translate}}</label>
                               <span id="rmnl-name{{$index}}" class="form-label-small text-wrap">{{role.name}}</span>

@@ -76,7 +76,7 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
     cancelButtonText: "No",
   };
 
-  public inputAdminConfig: StandardFormCardInputConfig[] = [
+  public inputConfig: StandardFormCardInputConfig[] = [
     {
       id: "rmnl-search-cpid",
       name: "rmnl-search-cpid",
@@ -87,19 +87,6 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
       showInput: true,
       placeholder: "fields.placeholder.search",
     },
-    {
-      id: "rmnl-search-name",
-      name: "rmnl-search-name",
-      formControlName: "name",
-      label: "pages.role.input.name.label",
-      sublabel: "pages.role.input.name.sublabel",
-      type: 'text',
-      showInput: true,
-      placeholder: "fields.placeholder.search"
-    },
-  ]
-
-  public inputConfig: StandardFormCardInputConfig[] = [
     {
       id: "rmnl-search-name",
       name: "rmnl-search-name",
@@ -128,13 +115,29 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
       name: this.fb.control(null),
     })
 
+    if (!this.permission.checkIsSystemAdmin()) {
+      // Company admin is scoped to its own company — lock the filter so it can't browse other companies.
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+      this.criteriaSearch.cpid = currentUser.cpid ?? null;
+      this.searchForm.controls.cpid.setValue(currentUser.cpid ?? null);
+      this.searchForm.controls.cpid.disable();
+    }
   }
 
   override async ngOnInit(): Promise<void> {
-    if (this.permission.checkIsSystemAdmin()) {
-      await this.getCompanyList(this.searchCompany);
-    }
+    await this.getCompanyList(this.searchCompany);
     super.ngOnInit();
+  }
+
+  override eventOnClear(_patchValue?: RoleSearch | Partial<RoleSearch>) {
+    if (this.permission.checkIsSystemAdmin()) {
+      super.eventOnClear(_patchValue);
+      return;
+    }
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+    this.searchForm.reset(_patchValue ?? {});
+    this.searchForm.controls.cpid.setValue(currentUser.cpid ?? null);
+    this.eventOnSearch();
   }
 
   getCompanyList(search: SearchCompany) {
@@ -144,7 +147,7 @@ export class StandardRoleListComponent extends StandardTrackingComponent<RoleSea
         .subscribe({
           next: (res) => {
             this.responseItemsCompany = (res && res.data && res.data.data) || [];
-            this.inputAdminConfig.filter(e => e.formControlName == "cpid").map(map =>{
+            this.inputConfig.filter(e => e.formControlName == "cpid").map(map =>{
               map.options = this.responseItemsCompany.map(company => this.mapToCompanyList(company))
             })
             resolve(null);

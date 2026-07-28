@@ -160,6 +160,25 @@ export class StandardUserListComponent extends StandardTrackingComponent<SearchU
       lastName: this.fb.control(null),
       username: this.fb.control(null),
     })
+
+    if (!this.permission.checkIsSystemAdmin()) {
+      // Company admin is scoped to its own company — lock the filter so it can't browse other companies.
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+      this.criteriaSearch.cpid = currentUser.cpid ?? null;
+      this.searchForm.controls.cpid.setValue(currentUser.cpid ?? null);
+      this.searchForm.controls.cpid.disable();
+    }
+  }
+
+  override eventOnClear(_patchValue?: SearchUser | Partial<SearchUser>) {
+    if (this.permission.checkIsSystemAdmin()) {
+      super.eventOnClear(_patchValue);
+      return;
+    }
+    const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+    this.searchForm.reset(_patchValue ?? {});
+    this.searchForm.controls.cpid.setValue(currentUser.cpid ?? null);
+    this.eventOnSearch();
   }
   override async ngOnInit(): Promise<void> {
     await this.getCompanyList(this.searchCompany);

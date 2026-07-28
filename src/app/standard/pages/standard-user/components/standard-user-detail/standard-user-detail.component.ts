@@ -203,9 +203,12 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       this.formControls.password.clearValidators();
       this.formControls.passwordConfirm.clearValidators();
       this.formGroup.updateValueAndValidity();
-      this.inputConfig.filter(p => p.formControlName == "passwordConfirm").map(map => {
-        map.showInput =  false
-      })
+      // Confirm Password (and its layout spacer) only makes sense when actually setting a password — drop both
+      // entirely in edit mode instead of just hiding, otherwise the 2-column grid leaves blank gaps behind.
+      // Password itself (masked, disabled) moves to the end so Name/Contact fields still pair up cleanly.
+      const passwordEntry = this.inputConfig.find(p => p.formControlName === "password")!;
+      this.inputConfig = this.inputConfig.filter(p => !["passwordConfirm", "empty", "password"].includes(p.formControlName));
+      this.inputConfig.push(passwordEntry);
     }
   }
 

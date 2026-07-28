@@ -91,17 +91,17 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
       this.formGroup.disable();
     }
 
+    // Platform admin manages roles across companies — must pick one before touching menus/permissions.
+    this.inputConfig.unshift({
+      id: "rmnc-role-company",
+      name: "rmnc-role-company",
+      formControlName: "cpid",
+      label: "pages.role.select.cpid.label",
+      sublabel: "pages.role.select.cpid.sublabel",
+      type: 'select',
+      showInput: true,
+    });
     if (this.permissions.checkIsSystemAdmin()) {
-      // Platform admin manages roles across companies — must pick one before touching menus/permissions.
-      this.inputConfig.unshift({
-        id: "rmnc-role-company",
-        name: "rmnc-role-company",
-        formControlName: "cpid",
-        label: "pages.role.select.cpid.label",
-        sublabel: "pages.role.select.cpid.sublabel",
-        type: 'select',
-        showInput: true,
-      });
       if (this.pageType === "edit") {
         // Existing role already belongs to a company — lock it, can't be reassigned.
         this.formGroup.controls.cpid.disable();
@@ -110,9 +110,10 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
         this.formGroup.controls.cpid.updateValueAndValidity();
       }
     } else {
-      // Company admin is scoped to their own company already — no picker needed.
+      // Company admin is scoped to their own company already — shown, but locked.
       const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
       this.formGroup.controls.cpid.setValue(currentUser.cpid ?? null);
+      this.formGroup.controls.cpid.disable();
     }
 
     if(this.pageType === "add"){
@@ -122,9 +123,7 @@ export class StandardRoleDetailComponent extends StandardFormComponent<IRole>{
 
 
   override async ngOnInit(): Promise<void> {
-    if (this.permissions.checkIsSystemAdmin()) {
-      await this.getCompanyList(this.searchCompany);
-    }
+    await this.getCompanyList(this.searchCompany);
     if (this.pageType === "add") {
       await this.getAllMenu();
     }
