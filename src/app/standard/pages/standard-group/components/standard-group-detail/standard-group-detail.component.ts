@@ -37,6 +37,12 @@ export interface GroupMemberRow {
   addedAt?: string;
 }
 
+interface PendingGroupMember {
+  uid: string;
+  roleId: number;
+  addedAt: string;
+}
+
 @Component({
   selector: 'app-standard-group-detail',
   standalone: true,
@@ -73,6 +79,8 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
   public allRoles: IRole[] = [];
   public allUsers: IUser[] = [];
   public groupMembers: GroupMemberRow[] = [];
+  // Add mode: no gid exists yet, so assignments are held here and committed after create succeeds.
+  public pendingMembers: PendingGroupMember[] = [];
   public memberEntryForm: FormGroup<{ uid: FormControl<string | null>; roleId: FormControl<number | null> }> = new FormGroup({
     uid: new FormControl<string | null>(null),
     roleId: new FormControl<number | null>(null),
@@ -181,6 +189,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.formGroup.controls.cpid?.valueChanges.subscribe((cpid) => {
       if(cpid){
         this.getApproveList(cpid);
+        this.loadUsersForMembers(cpid);
       }
     });
     this.inputCompanyConfig.filter(p => p.formControlName == "approval").map(map => {
@@ -231,7 +240,6 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.isLoading = false;
     let group: StandardGroup = (res && res.data) || {} as StandardGroup;
     this.patchGroupDetailValue(group);
-    this.loadGroupMembers(group.cpid);
   }
 
   patchGroupDetailValue(data: StandardGroup) {
@@ -320,12 +328,17 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     };
 
     this.fetchDataService.createGroup(createGroup).subscribe({
-      next: (res) => {
-        this.isLoading = false;
+      next: async (res) => {
         if (res.status.toLowerCase() === "success") {
+          const newGid = res.data?.gid;
+          if (newGid) {
+            await this.commitPendingMembers(newGid);
+          }
+          this.isLoading = false;
           this.alertService.alertDefaultSuccess(this.i18n.group.alertMessageCreateSuccess);
           super.onClosed();
         } else {
+          this.isLoading = false;
           this.alertService.alertDefaultError(this.i18n.group.alertMessageCreateFailure);
         }
       },
@@ -378,21 +391,24 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
 
   // --- Group Members ---
 
-  private membersCpid: string | null = null;
-
-  loadGroupMembers(cpid?: string | null) {
-    if (cpid !== undefined) {
-      this.membersCpid = cpid;
-    }
+  loadUsersForMembers(cpid: string | null) {
     const search = new SearchUser();
-    search.cpid = this.membersCpid;
+    search.cpid = cpid;
     this.userService.getUserList(1, 9999, search).subscribe({
       next: (res) => {
         this.allUsers = (res && res.data && res.data.data) || [];
-        this.refreshMemberRows();
+        this.refreshMemberDisplay();
       },
       error: (err) => console.log(err)
     });
+  }
+
+  refreshMemberDisplay() {
+    if (this.pageType === "add") {
+      this.refreshPendingRows();
+    } else {
+      this.refreshMemberRows();
+    }
   }
 
   refreshMemberRows() {
@@ -414,6 +430,25 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.groupMembers = rows;
   }
 
+  refreshPendingRows() {
+    const rows: GroupMemberRow[] = [];
+    for (const pm of this.pendingMembers) {
+      const user = this.allUsers.find(u => u.uid === pm.uid);
+      if (!user) {
+        continue;
+      }
+      rows.push({
+        uid: user.uid,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        roleId: pm.roleId,
+        addedAt: pm.addedAt,
+      });
+    }
+    this.groupMembers = rows;
+  }
+
   roleName(roleId: number): string {
     return this.allRoles.find(r => r.id === roleId)?.name ?? String(roleId);
   }
@@ -429,6 +464,18 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     if (!user) {
       return;
     }
+
+    if (this.pageType === "add") {
+      if (this.pendingMembers.some(pm => pm.uid === uid && pm.roleId === roleId)) {
+        this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
+        return;
+      }
+      this.pendingMembers = [...this.pendingMembers, { uid, roleId, addedAt: new Date().toISOString() }];
+      this.refreshPendingRows();
+      this.memberEntryForm.reset();
+      return;
+    }
+
     const existing = user.groupRoles ?? [];
     if (existing.some(gr => gr.gid === this.id && gr.roleId === roleId)) {
       this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
@@ -439,6 +486,11 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
   }
 
   removeMember(row: GroupMemberRow) {
+    if (this.pageType === "add") {
+      this.pendingMembers = this.pendingMembers.filter(pm => !(pm.uid === row.uid && pm.roleId === row.roleId));
+      this.refreshPendingRows();
+      return;
+    }
     const user = this.allUsers.find(u => u.uid === row.uid);
     if (!user) {
       return;
@@ -463,16 +515,28 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
       this.cancelEditMember();
       return;
     }
+    const targetRoleId = this.editRoleId;
+
+    if (this.pageType === "add") {
+      if (this.pendingMembers.some(pm => pm.uid === row.uid && pm.roleId === targetRoleId)) {
+        this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
+        return;
+      }
+      this.pendingMembers = this.pendingMembers.map(pm => (pm.uid === row.uid && pm.roleId === row.roleId) ? { ...pm, roleId: targetRoleId } : pm);
+      this.refreshPendingRows();
+      this.cancelEditMember();
+      return;
+    }
+
     const user = this.allUsers.find(u => u.uid === row.uid);
     if (!user) {
       return;
     }
     const existing = user.groupRoles ?? [];
-    if (existing.some(gr => gr.gid === this.id && gr.roleId === this.editRoleId)) {
+    if (existing.some(gr => gr.gid === this.id && gr.roleId === targetRoleId)) {
       this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
       return;
     }
-    const targetRoleId = this.editRoleId;
     const updated = existing.map(gr => (gr.gid === this.id && gr.roleId === row.roleId) ? { ...gr, roleId: targetRoleId } : gr);
     this.persistUserGroupRoles(user.uid, updated, () => this.cancelEditMember());
   }
@@ -482,7 +546,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.userService.updateUser({ uid, groupRoles } as unknown as User).subscribe({
       next: () => {
         this.isLoading = false;
-        this.loadGroupMembers();
+        this.loadUsersForMembers(this.formGroup.controls.cpid.value);
         onSuccess?.();
       },
       error: (err) => {
@@ -490,6 +554,17 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
         console.log(err);
       }
     });
+  }
+
+  private async commitPendingMembers(gid: string) {
+    for (const pm of this.pendingMembers) {
+      const user = this.allUsers.find(u => u.uid === pm.uid);
+      if (!user) {
+        continue;
+      }
+      const updated: IUserGroupRole[] = [...(user.groupRoles ?? []), { gid, roleId: pm.roleId, addedAt: pm.addedAt }];
+      await lastValueFrom(this.userService.updateUser({ uid: user.uid, groupRoles: updated } as unknown as User));
+    }
   }
 
 }
