@@ -175,21 +175,28 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
 
     this.addEntryRow();
 
+    // Company field always shown first. Platform admin picks it (add) or sees it locked (edit);
+    // company admin always sees it locked to their own company.
+    this.inputConfig.unshift({
+      id: "umnc-company",
+      name: "umnc-company",
+      formControlName: "cpid",
+      label: "pages.user.detail.select.cpid.label",
+      sublabel: "pages.user.detail.select.cpid.sublabel",
+      type: 'select',
+      showInput: true,
+    });
+
     if (this.pageType === "add") {
-      // Company is no longer picked here — new users belong to the creating admin's own company.
-      const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
-      this.formGroup.controls.cpid.setValue(currentUser.cpid ?? null);
+      if (this.permissions.checkIsSystemAdmin()) {
+        // Platform admin must pick the company for a new user.
+      } else {
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+        this.formGroup.controls.cpid.setValue(currentUser.cpid ?? null);
+        this.formGroup.controls.cpid.disable();
+      }
     } else {
       // Existing user already belongs to a company — show it, but it can't be reassigned here.
-      this.inputConfig.unshift({
-        id: "umnc-company",
-        name: "umnc-company",
-        formControlName: "cpid",
-        label: "pages.user.detail.select.cpid.label",
-        sublabel: "pages.user.detail.select.cpid.sublabel",
-        type: 'select',
-        showInput: true,
-      });
       this.formGroup.controls.cpid.disable();
     }
 
