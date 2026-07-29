@@ -185,6 +185,13 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
         this.formGroup.controls.approvalId.updateValueAndValidity();
       }
     });
+
+    if (!this.permissions.checkIsSystemAdmin()) {
+      // Company admin always creates/edits groups within their own company — lock it, add and edit alike.
+      const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+      this.formGroup.controls.cpid.setValue(currentUser.cpid ?? null);
+      this.formGroup.controls.cpid.disable();
+    }
   }
 
   override async ngOnInit(): Promise<void> {
