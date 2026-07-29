@@ -3,25 +3,38 @@ import { Component, inject } from '@angular/core';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { StandardErrorMessageComponent } from '../../../../shared/components/standard-error-message/standard-error-message.component';
 import { StandardFormCardComponent, StandardFormCardInputConfig } from '../../../../shared/components/standard-form-card/standard-form-card.component';
-import { GroupRoleMenu, IGroupRole, IGroupRoleMenu, StandardGroup, StandardGroupCreateForm, StandardGroupForm } from '../../models/standard-group.model';
+import { StandardGroup, StandardGroupCreateForm } from '../../models/standard-group.model';
 import { StandardFormComponent } from '../../../../shared/abstracts/components/standard-form/standard-form.component';
-import { FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { StandardGroupService } from '../../services/standard-group.service';
 import { StandardConfGlobalService } from '../../../../core/services/standard-conf-global.service';
 import { StandardAppPermissionService } from '../../../../core/services/standard-app-permission.service';
 import { StandardCompanyService } from '../../../standard-company/services/standard-company.service';
 import { StandardRegisterManagementService } from '../../../standard-register-management/services/standard-register-management.service';
 import { SearchCompany, ICompany } from '../../../standard-company/models/standard-company.model';
-import { RoleSearch } from '../../../standard-role/models/standard-role.model';
+import { RoleSearch, IRole } from '../../../standard-role/models/standard-role.model';
 import { StandardRoleService } from '../../../standard-role/services/standard-role.service';
-import { forkJoin, lastValueFrom, of } from 'rxjs';
+import { StandardUserService } from '../../../standard-user/services/standard-user.service';
+import { IUser, SearchUser, IUserGroupRole, User } from '../../../standard-user/models/standard-user.model';
+import { lastValueFrom } from 'rxjs';
 import { TranslateModule } from '@ngx-translate/core';
 import { StandardTranslateService } from '../../../../shared/service/standard-translate.service';
 export interface ApproveOption {
   label: string | null;
   value: string | null;
+}
+
+export interface GroupMemberRow {
+  uid: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleId: number;
+  addedAt?: string;
 }
 
 @Component({
@@ -32,6 +45,8 @@ export interface ApproveOption {
     FormsModule,
     NzGridModule,
     NzCardModule,
+    NzIconModule,
+    NzSelectModule,
     StandardFormCardComponent,
     StandardErrorMessageComponent,
     NzFormModule,
@@ -45,25 +60,27 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
   public override pageTitle: string = this.i18n.group.pageTitle;
   public fetchDataService: StandardGroupService = inject(StandardGroupService);
   public standardTranslateService: StandardTranslateService = inject(StandardTranslateService);
+  public userService: StandardUserService = inject(StandardUserService);
   public formGroup: FormGroup<StandardGroupCreateForm>;
   public formControl: StandardGroupCreateForm = new StandardGroupCreateForm();
   private searchCompany: SearchCompany = new SearchCompany();
   public responseItemsCompany: ICompany[] = [];
   public approvals: StandardGroup[] = [];
-  public roles: any[] = [];
-  public roleMenus: any[] = [];
-  public roleArrs: FormArray = new FormArray<FormControl<boolean | null>>([]);
-  public groupRoles: any[] = [];
-  private searchRole: RoleSearch = new RoleSearch();
   ReadOnlyStyleGuideNotes:boolean =false;
-  public isSelected: boolean = false;
-  public roleLabel: string = "pages.group.input.role.label";
-  public menuLabel: string = "pages.group.input.menu.label";
-  public roleNotFound: string = "pages.group.input.role.not.found";
-  public roleNotFoundAdd: string = "pages.group.input.role.not.found.add";
-  public roleNotFoundTag: string = "pages.group.input.role.not.found.tag";
-  public roleNotFoundOf: string = "pages.group.input.role.not.found.of";
-  public roleNotFoundCompany: string = "pages.group.input.role.not.found.company";
+
+  // Group Members — mock-only, see IUserGroupRole: assigns users to this group with a role,
+  // stored on the user record (no tab_user_group_role table in the real schema).
+  public allRoles: IRole[] = [];
+  public allUsers: IUser[] = [];
+  public groupMembers: GroupMemberRow[] = [];
+  public memberEntryForm: FormGroup<{ uid: FormControl<string | null>; roleId: FormControl<number | null> }> = new FormGroup({
+    uid: new FormControl<string | null>(null),
+    roleId: new FormControl<number | null>(null),
+  });
+  public editingMemberIndex: number | null = null;
+  public editRoleId: number | null = null;
+  public groupMemberTitle: string = "pages.group.detail.memberRole.title";
+  public groupMemberSubtitle: string = "pages.group.detail.memberRole.subtitle";
 
   public approveList:ApproveOption[] = [
     {
@@ -164,10 +181,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.formGroup.controls.cpid?.valueChanges.subscribe((cpid) => {
       if(cpid){
         this.getApproveList(cpid);
-        this.searchRole.cpid = this.formGroup.controls.cpid.value;
-        this.getRoleList(this.searchRole);
       }
-      // this.eventOnCompanyChange();
     });
     this.inputCompanyConfig.filter(p => p.formControlName == "approval").map(map => {
       map.options = this.approveList.map(approve => this.mapApproveOptionToList(approve))
@@ -199,10 +213,14 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     if (this.pageType == "add") {
       if (this.responseItemsCompany  && this.responseItemsCompany.length == 1 ){
         this.formGroup.controls.cpid.setValue(this.responseItemsCompany[0].cpid);
-        this.searchRole.cpid = this.responseItemsCompany[0].cpid;
-        this.getRoleList(this.searchRole);
       }
     }
+    this.roleService.getRoleList(1, 9999, new RoleSearch()).subscribe({
+      next: (res) => {
+        this.allRoles = (res && res.data && res.data.data) || [];
+      },
+      error: (err) => console.log(err)
+    });
     super.ngOnInit();
   }
 
@@ -213,35 +231,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     this.isLoading = false;
     let group: StandardGroup = (res && res.data) || {} as StandardGroup;
     this.patchGroupDetailValue(group);
-    let searchRole = new RoleSearch();
-    searchRole.cpid = group.cpid;
-    searchRole.cpid = this.permissions.checkIsSystemAdmin() ? null : group.cpid;
-    const listRole$ = this.roleService.getRoleList(1, 9999, searchRole);
-    const listGroupRole$ = this.fetchDataService.getGroupRoleList(gid);
-    const listApproval$ = group.approval ? this.fetchDataService.getApprovalList(group.cpid) : of([]);
-
-    this.isLoading = true;
-
-
-
-    forkJoin({listRole: listRole$ , listGroupRole: listGroupRole$, listApproval: listApproval$}).subscribe({
-      next: (res: any) => {
-        this.isLoading = false;
-        this.roles = (res && res['listRole'] && res['listRole'].data && res['listRole'].data.data) || [];
-        this.groupRoles = (res && res['listGroupRole'] && res['listGroupRole'].data) || [];
-        this.approvals = (res && res['listApproval'] && res['listApproval'].data) || [];
-        this.patchRoleValue(this.roles);
-        let roleIds: any[] = [];
-        this.groupRoles.forEach(function (value) {
-          roleIds.push(value.roleId);
-        });
-        this.getRoleMenus(roleIds);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.log(err);
-      }
-    });
+    this.loadGroupMembers(group.cpid);
   }
 
   patchGroupDetailValue(data: StandardGroup) {
@@ -290,114 +280,16 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
   mapToGroupApprovalList(item: StandardGroup) {
     return { value: item.gid != undefined ? item.gid: null, label: item.name };
   }
-  getRoleList(searchRole: RoleSearch) {
-    this.isLoading = true;
-    this.roleService.getRoleList(1, 9999, searchRole).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        this.roles = (res && res.data && res.data.data) || [];
-        if (this.roles.length == 0) {
-          this.roleMenus = [];
-        }
-        this.patchRoleValue(this.roles);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.log(err);
-      }
-    });
-  }
-
-  patchRoleValue(data: any[]) {
-    this.formGroup.controls.roles.clear();
-    data.forEach((role) => this.formGroup.controls.roles.push(new FormControl(false)));
-    if (this.pageType === "edit") {
-      for (let grole of this.groupRoles) {
-        let roleIdx: number = this.roles.findIndex(
-          (role) => role.id == grole.roleId
-        );
-        this.formGroup.controls.roles.at(roleIdx).patchValue(true);
-      }
-    }
-    this.formGroup.updateValueAndValidity();
-    this.eventOnChangeRole();
-  }
-  eventOnChangeRole() {
-    let roleIds: any[] = [];
-    this.formGroup.getRawValue().roles.filter((selected: any, i: number) => {
-      if (selected) {
-        roleIds.push(this.roles[i].id);
-      }
-    });
-
-    this.getRoleMenus(roleIds);
-  }
-  getRoleMenus(data:any) {
-    this.isLoading = true;
-    let reqeust: IGroupRoleMenu = new IGroupRoleMenu();
-    reqeust.roleId = data;
-    this.fetchDataService.getRoleMenus(reqeust).subscribe({
-      next: (res) => {
-        this.isLoading = false;
-        const menus = res.data ? res.data : []
-        this.mappingMenu(menus);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        console.log(err);
-      }
-    });
-  }
-
-  mappingMenu(datas: GroupRoleMenu[]) {
-    this.roleMenus = [];
-    let matchs: any[] = [];
-    let notMatchs: GroupRoleMenu[] = [];
-    datas.forEach((data) => {
-      if (data.isSubMenu) {
-        notMatchs.push(data);
-      } else {
-        matchs.push(data);
-      }
-    });
-    notMatchs.forEach((notMatch) => {
-      matchs.forEach((match) => {
-        if (match.id == notMatch.parentMenuId){
-          if (!match.subMenu || match.subMenu.length == 0)
-            match.subMenu = [];
-          match.subMenu.push(notMatch);
-        }
-      });
-    });
-    this.roleMenus = matchs;
-  }
-
   changeUserLimit(checked: boolean) {
     this.formGroup.controls.limitUser.setValue(checked ? -1 : null);
   }
 
-  get r() {
-    return this.formGroup.controls.roles as FormArray;
-  }
-
-  changeRoles(checked: boolean, i:number) {
-    this.r.at(i).setValue(checked ? -1 : null);
-  }
-
-  checkRoleSelected(role: any) {
-    return role === true;
-  }
-
   save(): void | boolean {
     this.isSubmit = true;
-    const roles: any = this.formGroup.getRawValue().roles.filter(this.checkRoleSelected);
-    if(roles.length === 0){
-      this.isSelected = true;
-    }
     const limitUser: number | null = this.formGroup.controls.limitUser.value;
 
     this.formGroup.markAllAsTouched();
-    if (this.formGroup.invalid || roles.length === 0) {
+    if (this.formGroup.invalid) {
       return false;
     }
     if (limitUser != null && limitUser < -1) {
@@ -410,38 +302,14 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
       this.processUpdateGroup(this.formGroup.getRawValue());
     }
   }
-  checkRole(data: any){
-    if (data.length === 0) {
-      return false;
-    }
-    return true;
-  }
 
   processCreateGroup(formValue: any) {
     this.isLoading = true;
-    let roleSelected: IGroupRole[] = [];
-
-    formValue.roles.filter((selected: any, i: number) => {
-      if (selected) {
-        roleSelected.push({
-          gid: null,
-          name: this.roles[i].name,
-          roleId: this.roles[i].id,
-        });
-      }
-    });
-    const checked = this.checkRole(roleSelected);
-    if (!checked) {
-      this.isLoading = false;
-      // Swal.fire("Warning", "Please select role.", "warning");
-      // return;
-    }
-
     const createGroup: StandardGroup = {
       cpid: formValue.cpid,
       name: formValue.name,
       limitUser: formValue.limitUser,
-      grouprole: roleSelected,
+      grouprole: [],
       isActive: true,
       approval: formValue.approval,
       approvalId: formValue.approvalId,
@@ -471,29 +339,12 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
 
   processUpdateGroup(formValue: any) {
     this.isLoading = true;
-    let roleSelected: any[] = [];
-    formValue.roles.filter((selected: any, i: number) => {
-      if (selected) {
-        roleSelected.push({
-          gid: this.id,
-          name: this.roles[i].name,
-          roleId: this.roles[i].id,
-        });
-      }
-    });
-
-    const checked = this.checkRole(roleSelected);
-    if (!checked) {
-      this.isLoading = false;
-      // Swal.fire("Warning", "Please select role.", "warning");
-      // return;
-    }
     const updateGroup: StandardGroup = {
       cpid: formValue.cpid,
       name: formValue.name,
       limitUser: formValue.limitUser,
       gid: this.id,
-      grouprole: roleSelected,
+      grouprole: [],
       approval: formValue.approval,
       approvalId: formValue.approvalId,
       isActive: null
@@ -523,6 +374,122 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
 
   getLang(){
     return this.standardTranslateService.getLang();
+  }
+
+  // --- Group Members ---
+
+  private membersCpid: string | null = null;
+
+  loadGroupMembers(cpid?: string | null) {
+    if (cpid !== undefined) {
+      this.membersCpid = cpid;
+    }
+    const search = new SearchUser();
+    search.cpid = this.membersCpid;
+    this.userService.getUserList(1, 9999, search).subscribe({
+      next: (res) => {
+        this.allUsers = (res && res.data && res.data.data) || [];
+        this.refreshMemberRows();
+      },
+      error: (err) => console.log(err)
+    });
+  }
+
+  refreshMemberRows() {
+    const rows: GroupMemberRow[] = [];
+    for (const user of this.allUsers) {
+      for (const gr of user.groupRoles ?? []) {
+        if (gr.gid === this.id) {
+          rows.push({
+            uid: user.uid,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            roleId: gr.roleId,
+            addedAt: gr.addedAt,
+          });
+        }
+      }
+    }
+    this.groupMembers = rows;
+  }
+
+  roleName(roleId: number): string {
+    return this.allRoles.find(r => r.id === roleId)?.name ?? String(roleId);
+  }
+
+  addMember() {
+    const uid = this.memberEntryForm.controls.uid.value;
+    const roleId = this.memberEntryForm.controls.roleId.value;
+    if (!uid || !roleId) {
+      this.memberEntryForm.markAllAsTouched();
+      return;
+    }
+    const user = this.allUsers.find(u => u.uid === uid);
+    if (!user) {
+      return;
+    }
+    const existing = user.groupRoles ?? [];
+    if (existing.some(gr => gr.gid === this.id && gr.roleId === roleId)) {
+      this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
+      return;
+    }
+    const updated: IUserGroupRole[] = [...existing, { gid: this.id as string, roleId, addedAt: new Date().toISOString() }];
+    this.persistUserGroupRoles(user.uid, updated, () => this.memberEntryForm.reset());
+  }
+
+  removeMember(row: GroupMemberRow) {
+    const user = this.allUsers.find(u => u.uid === row.uid);
+    if (!user) {
+      return;
+    }
+    const updated = (user.groupRoles ?? []).filter(gr => !(gr.gid === this.id && gr.roleId === row.roleId));
+    this.persistUserGroupRoles(user.uid, updated);
+  }
+
+  startEditMember(index: number) {
+    this.editingMemberIndex = index;
+    this.editRoleId = this.groupMembers[index].roleId;
+  }
+
+  cancelEditMember() {
+    this.editingMemberIndex = null;
+    this.editRoleId = null;
+  }
+
+  saveEditMember(index: number) {
+    const row = this.groupMembers[index];
+    if (!this.editRoleId || this.editRoleId === row.roleId) {
+      this.cancelEditMember();
+      return;
+    }
+    const user = this.allUsers.find(u => u.uid === row.uid);
+    if (!user) {
+      return;
+    }
+    const existing = user.groupRoles ?? [];
+    if (existing.some(gr => gr.gid === this.id && gr.roleId === this.editRoleId)) {
+      this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
+      return;
+    }
+    const targetRoleId = this.editRoleId;
+    const updated = existing.map(gr => (gr.gid === this.id && gr.roleId === row.roleId) ? { ...gr, roleId: targetRoleId } : gr);
+    this.persistUserGroupRoles(user.uid, updated, () => this.cancelEditMember());
+  }
+
+  private persistUserGroupRoles(uid: string, groupRoles: IUserGroupRole[], onSuccess?: () => void) {
+    this.isLoading = true;
+    this.userService.updateUser({ uid, groupRoles } as unknown as User).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.loadGroupMembers();
+        onSuccess?.();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.log(err);
+      }
+    });
   }
 
 }

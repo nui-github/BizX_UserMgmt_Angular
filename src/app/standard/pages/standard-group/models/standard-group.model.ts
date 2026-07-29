@@ -85,8 +85,6 @@ export class StandardGroupCreateForm {
   public limitUser: FormControl<number | null>;
   public approval: FormControl<string | boolean | null>;
   public approvalId: FormControl<string | null>;
-  // public roles: FormArray;
-  public roles: FormArray<FormControl<boolean | null>>;
   constructor(){
     this.cpid = new FormControl(null, Validators.required);
     this.name = new FormControl(null, Validators.required);
@@ -98,8 +96,6 @@ export class StandardGroupCreateForm {
     this.createTime = new FormControl(null);
     this.lastUpdateTime = new FormControl(null);
     this.isActive = new FormControl(null);
-    this.roles = new FormArray<FormControl<boolean | null>>([]);
-    // this.roles = new FormArray<AbstractControl>([]);
   }
 }
 

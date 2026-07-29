@@ -308,7 +308,7 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       this.alertService.alertDefaultError('pages.user.detail.groupRole.duplicate.error');
       return;
     }
-    this.assignedGroupRoles = [...this.assignedGroupRoles, { gid, roleId }];
+    this.assignedGroupRoles = [...this.assignedGroupRoles, { gid, roleId, addedAt: new Date().toISOString() }];
     this.syncGroupRolesControl();
     this.entryRows.removeAt(index);
     if (this.entryRows.length === 0) {

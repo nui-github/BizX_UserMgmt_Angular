@@ -41,6 +41,7 @@ export class SearchUser implements ISearchUser {
 export interface IUserGroupRole {
   gid: string;
   roleId: number;
+  addedAt?: string;
 }
 
 export interface IUser {

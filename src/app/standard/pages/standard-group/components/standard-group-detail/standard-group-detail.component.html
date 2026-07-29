@@ -45,92 +45,127 @@
 </form> -->
 <!-- <app-standard-form-card [formGroup]="formGroup" [amountOfInputPerRow]="2" [isSubmit]="isSubmit" [inputConfig]="inputApproveConfig">
 </app-standard-form-card> -->
-@if(formGroup.controls['cpid'].value){
-  <form nz-form autocomplete="off" novalidate [nzLayout]="'vertical'" >
-    <div nz-row [nzGutter]="16" >
-      <div nz-col [nzSpan]="24" [nzMd]="12">
-        <nz-form-item >
-          <nz-form-label nzFor="gmn-roles">
-            <span>
-              {{ roleLabel | translate }}
-            </span>
-          </nz-form-label>
-          <nz-form-control >
-                    <div class="form-group form-check mb-0">
-                      <ng-container *ngIf="!isLoading; else loading">
-                        @for(role of this.formGroup.controls.roles.controls; track $index){
-                        <div id="gmnc-role-user" class="form-check" >
-                          <input title="Roles {{roles[$index].name}}" *ngIf="this.hasPermissions" class="form-check-input"
-                          [formControl]="role" type="checkbox" id="gmnc-role-check-{{$index}}" (click)="isSelected = true" (change)="eventOnChangeRole()">
-                          <input title="Roles {{roles[$index].name}}" *ngIf="!this.hasPermissions" class="form-check-input"
-                          [formControl]="role" type="checkbox" id="gmnc-role-check-{{$index}}">
-                          <label class="form-label" for="gmnc-role-check-{{$index}}">
-                            {{roles[$index].name}}
-                          </label>
-                        </div>
+@if (pageType === 'edit') {
+<div class="mt-8 pt-6 border-top">
+  <h5 class="mb-1">{{ groupMemberTitle | translate }}</h5>
+  <p class="card-subtitle mb-4">{{ groupMemberSubtitle | translate }}</p>
 
-                        }
-                        @if(formGroup.getRawValue().roles.filter(checkRoleSelected).length === 0 && isSelected && roles.length > 0){
-                          <div class="role-error">
-                          <span class="role-error-text">
-                            @if(getLang() == 'en'){
-                              {{ roleLabel | translate }} {{ i18n.validation.required  | translate }}
-                            }@else {
-                              {{ i18n.validation.required  | translate }} {{ roleLabel | translate }}
-                            }
-
-                          </span>
-                        </div>
-                        }
-                        @if(roles.length == 0){
-                          <div class="role-error">
-                            <span class="role-error-text">
-                              @if(getLang() == 'en'){
-                                {{ roleLabel | translate }} {{ roleNotFound  | translate }} {{ roleNotFoundAdd  | translate }} {{ roleNotFoundCompany  | translate }}  {{ roleNotFoundTag  | translate }}
-                              }@else {
-                                {{ roleNotFound  | translate }} {{ roleLabel | translate }} {{ roleNotFoundAdd  | translate }}{{ roleLabel | translate }}{{ roleNotFoundOf  | translate }}{{ roleNotFoundCompany  | translate }}
-                              }
-                            </span>
-                          </div>
-                        }
-                      </ng-container>
-                      <ng-template #loading>
-                      </ng-template>
-                    </div>
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-      <div nz-col [nzSpan]="24" [nzMd]="12">
-        <nz-form-item>
-          <nz-form-label nzFor="gmn-roles">
-            <span>
-              {{ menuLabel | translate }}
-            </span>
-          </nz-form-label>
-          <nz-form-control>
-            <ul id="group-menu">
-              <div class="form-group form-check">
-              @for(menu of roleMenus; track $index){
-                <div id="gmnc-group-menu-{{menu.id}}" class="form-check">
-                  <input class="form-check-input" type="checkbox" id="gmnc-group-menucheck-{{menu.id}}" disabled="true" [checked]="true">
-                  <label class="form-label" for="gmnc-group-menucheck-{{menu.id}}">{{menu.name}}</label>
-                </div>
-                <ul id="group-menu">
-                  @for (subMenu of menu.subMenu; track $index) {
-                    <div id="gmnc-group-submenu-{{subMenu.id}}" class="form-check sub-menu-margin">
-                      <input class="form-check-input" type="checkbox" id="gmnc-group-submenucheck-{{subMenu.id}}" disabled="true" [checked]="true">
-                      <label class="form-label" for="gmnc-group-submenucheck-{{subMenu.id}}">{{subMenu.name}}</label>
-                    </div>
-                  }
-              </ul>
+  @if (groupMembers.length) {
+    <div class="table-responsive mb-5">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>{{ 'pages.group.detail.memberRole.table.addedAt' | translate }}</th>
+            <th>{{ 'pages.group.detail.memberRole.table.name' | translate }}</th>
+            <th>{{ 'pages.group.detail.memberRole.table.email' | translate }}</th>
+            <th>{{ 'pages.group.detail.memberRole.table.role' | translate }}</th>
+            @if (hasPermissions) {
+              <th class="text-end text-nowrap">{{ 'pages.group.detail.memberRole.table.action' | translate }}</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of groupMembers; track row.uid + '-' + row.roleId; let i = $index) {
+            <tr>
+              <td id="gmnc-member-addedat-{{i}}">{{ row.addedAt ? (row.addedAt | date: 'yyyy-MM-dd H:mm:ss') : '-' }}</td>
+              <td id="gmnc-member-name-{{i}}">{{ row.firstName }} {{ row.lastName }}</td>
+              <td id="gmnc-member-email-{{i}}">{{ row.email }}</td>
+              <td id="gmnc-member-role-{{i}}">
+                @if (editingMemberIndex === i) {
+                  <nz-select [(ngModel)]="editRoleId" [ngModelOptions]="{standalone: true}" nzSize="small" class="form-control" [nzBorderless]="true">
+                    @for (r of allRoles; track r.id) {
+                      <nz-option [nzValue]="r.id" [nzLabel]="r.name"></nz-option>
+                    }
+                  </nz-select>
+                } @else {
+                  {{ roleName(row.roleId) }}
+                }
+              </td>
+              @if (hasPermissions) {
+                <td class="text-end text-nowrap">
+                  <div class="d-flex gap-2 justify-content-end">
+                    @if (editingMemberIndex === i) {
+                      <button type="button" id="gmnc-member-save-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="saveEditMember(i)">
+                        <i nz-icon nzType="check"></i>
+                      </button>
+                      <button type="button" id="gmnc-member-canceledit-{{i}}" class="btn btn-outline-secondary btn-icon btn-sm" (click)="cancelEditMember()">
+                        <i nz-icon nzType="close"></i>
+                      </button>
+                    } @else {
+                      <button type="button" id="gmnc-member-edit-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="startEditMember(i)">
+                        <i nz-icon nzType="edit"></i>
+                      </button>
+                      <button type="button" id="gmnc-member-remove-{{i}}" class="btn btn-outline-danger btn-icon btn-sm" (click)="removeMember(row)">
+                        <i nz-icon nzType="delete"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
               }
-              </div>
-            </ul>
-          </nz-form-control>
-        </nz-form-item>
-      </div>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-  </form>
+  }
+
+  @if (hasPermissions) {
+    <form nz-form [nzLayout]="'vertical'" [formGroup]="memberEntryForm">
+      <div nz-row nzAlign="bottom" [nzGutter]="16">
+        <div nz-col [nzSpan]="24" [nzMd]="9">
+          <nz-form-item>
+            <nz-form-label nzFor="gmnc-member-uid">
+              <span>
+                {{ 'pages.group.detail.memberRole.user.label' | translate }}
+                <br>
+                <span class="form-label-small">{{ 'pages.group.detail.memberRole.user.sublabel' | translate }}</span>
+              </span>
+            </nz-form-label>
+            <nz-form-control>
+              <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
+                id="gmnc-member-uid" formControlName="uid" nzPlaceHolder="{{ 'fields.select' | translate }}">
+                @for (u of allUsers; track u.uid) {
+                  <nz-option [nzValue]="u.uid" [nzLabel]="u.firstName + ' ' + u.lastName + ' - ' + u.email"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="24" [nzMd]="9">
+          <nz-form-item>
+            <nz-form-label nzFor="gmnc-member-roleid">
+              <span>
+                {{ 'pages.group.detail.memberRole.role.label' | translate }}
+                <br>
+                <span class="form-label-small">{{ 'pages.group.detail.memberRole.role.sublabel' | translate }}</span>
+              </span>
+            </nz-form-label>
+            <nz-form-control>
+              <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
+                id="gmnc-member-roleid" formControlName="roleId" nzPlaceHolder="{{ 'fields.select' | translate }}">
+                @for (r of allRoles; track r.id) {
+                  <nz-option [nzValue]="r.id" [nzLabel]="r.name"></nz-option>
+                }
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div nz-col [nzSpan]="24" [nzMd]="6">
+          <nz-form-item>
+            <nz-form-label class="invisible" aria-hidden="true">
+              <span>&nbsp;<br><span class="form-label-small">&nbsp;</span></span>
+            </nz-form-label>
+            <nz-form-control>
+              <button type="button" id="gmnc-member-add-btn" class="btn btn-primary w-100" (click)="addMember()">
+                {{ i18n.buttons.add | translate }}
+              </button>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+    </form>
+  }
+</div>
 }
 <div class="d-flex flex-wrap gap-6 align-items-center">
   <div>
