@@ -184,7 +184,9 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
 
     if (this.pageType === "edit") {
       this.formGroup.controls.name.disable();
-
+      // Company is locked in on edit for everyone — reassigning it after creation would ripple
+      // into every user/role already scoped to this group's company.
+      this.formGroup.controls.cpid.disable();
     }
     this.formGroup.controls.cpid?.valueChanges.subscribe((cpid) => {
       if(cpid){
