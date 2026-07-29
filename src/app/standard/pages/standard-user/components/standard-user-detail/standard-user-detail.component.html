@@ -10,8 +10,9 @@
       @for (item of assignedGroupRoles; track item.gid + '-' + item.roleId) {
         <div class="d-flex align-items-center justify-content-between gap-3 px-4 py-3 border rounded-2 bg-body-tertiary">
           <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge bg-primary-subtle text-primary rounded-pill fw-normal">{{ 'pages.user.detail.select.gid.label' | translate }}</span>
             <span id="umnc-grouprole-group-{{$index}}" class="fw-semibold">{{ groupName(item.gid) }}</span>
-            <span class="text-body-secondary">/</span>
+            <span class="badge bg-info-subtle text-info rounded-pill fw-normal ms-2">{{ 'pages.user.detail.groupRole.role.label' | translate }}</span>
             <span id="umnc-grouprole-role-{{$index}}">{{ roleName(item.roleId) }}</span>
           </div>
           @if (hasPermissions) {
