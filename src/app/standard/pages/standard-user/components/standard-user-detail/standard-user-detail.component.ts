@@ -84,15 +84,6 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       }
     },
     {
-      id: "empty",
-      name: "empty",
-      formControlName: "empty",
-      label: "empty",
-      sublabel: "empty",
-      type: 'empty',
-      showInput: false
-    },
-    {
       id: "umnc-confirm-password",
       name: "umnc-confirm-password",
       formControlName: "passwordConfirm",
@@ -210,11 +201,11 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       this.formControls.password.clearValidators();
       this.formControls.passwordConfirm.clearValidators();
       this.formGroup.updateValueAndValidity();
-      // Confirm Password (and its layout spacer) only makes sense when actually setting a password — drop both
-      // entirely in edit mode instead of just hiding, otherwise the 2-column grid leaves blank gaps behind.
+      // Confirm Password only makes sense when actually setting a password — drop it entirely in edit
+      // mode instead of just hiding, otherwise the 2-column grid leaves a blank gap behind.
       // Password itself (masked, disabled) moves to the end so Name/Contact fields still pair up cleanly.
       const passwordEntry = this.inputConfig.find(p => p.formControlName === "password")!;
-      this.inputConfig = this.inputConfig.filter(p => !["passwordConfirm", "empty", "password"].includes(p.formControlName));
+      this.inputConfig = this.inputConfig.filter(p => !["passwordConfirm", "password"].includes(p.formControlName));
       this.inputConfig.push(passwordEntry);
     }
   }
