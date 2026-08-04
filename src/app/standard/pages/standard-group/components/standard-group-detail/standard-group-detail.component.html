@@ -50,25 +50,32 @@
   <p class="card-subtitle mb-4">{{ groupMemberSubtitle | translate }}</p>
 
   @if (groupMembers.length) {
-    <div class="table-responsive mb-5">
-      <table class="table align-middle">
+    <div class="table-responsive mb-5 border rounded-3">
+      <table class="table table-hover align-middle mb-0">
         <thead>
-          <tr>
-            <th>{{ 'pages.group.detail.memberRole.table.addedAt' | translate }}</th>
-            <th>{{ 'pages.group.detail.memberRole.table.name' | translate }}</th>
-            <th>{{ 'pages.group.detail.memberRole.table.email' | translate }}</th>
-            <th>{{ 'pages.group.detail.memberRole.table.role' | translate }}</th>
+          <tr class="text-uppercase text-muted small">
+            <th class="border-0 ps-4">{{ 'pages.group.detail.memberRole.table.name' | translate }}</th>
+            <th class="border-0">{{ 'pages.group.detail.memberRole.table.role' | translate }}</th>
+            <th class="border-0">{{ 'pages.group.detail.memberRole.table.addedAt' | translate }}</th>
             @if (hasPermissions) {
-              <th class="text-end text-nowrap">{{ 'pages.group.detail.memberRole.table.action' | translate }}</th>
+              <th class="border-0 text-end text-nowrap pe-4">{{ 'pages.group.detail.memberRole.table.action' | translate }}</th>
             }
           </tr>
         </thead>
         <tbody>
           @for (row of groupMembers; track row.uid + '-' + row.roleId; let i = $index) {
             <tr>
-              <td id="gmnc-member-addedat-{{i}}">{{ row.addedAt ? (row.addedAt | date: 'yyyy-MM-dd H:mm:ss') : '-' }}</td>
-              <td id="gmnc-member-name-{{i}}">{{ row.firstName }} {{ row.lastName }}</td>
-              <td id="gmnc-member-email-{{i}}">{{ row.email }}</td>
+              <td class="ps-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="rounded-circle bg-primary-subtle text-primary fw-semibold d-flex align-items-center justify-content-center flex-shrink-0" style="width:36px;height:36px;">
+                    {{ (row.firstName | slice:0:1) | uppercase }}
+                  </div>
+                  <div>
+                    <div id="gmnc-member-name-{{i}}" class="fw-semibold">{{ row.firstName }} {{ row.lastName }}</div>
+                    <div id="gmnc-member-email-{{i}}" class="text-muted small">{{ row.email }}</div>
+                  </div>
+                </div>
+              </td>
               <td id="gmnc-member-role-{{i}}">
                 @if (editingMemberIndex === i) {
                   <nz-select [(ngModel)]="editRoleId" [ngModelOptions]="{standalone: true}" nzSize="small" class="form-control" [nzBorderless]="true">
@@ -77,24 +84,25 @@
                     }
                   </nz-select>
                 } @else {
-                  {{ roleName(row.roleId) }}
+                  <span class="badge bg-info-subtle text-info rounded-pill fw-normal">{{ roleName(row.roleId) }}</span>
                 }
               </td>
+              <td class="text-muted small text-nowrap">{{ row.addedAt ? (row.addedAt | date: 'yyyy-MM-dd H:mm') : '-' }}</td>
               @if (hasPermissions) {
-                <td class="text-end text-nowrap">
+                <td class="text-end text-nowrap pe-4">
                   <div class="d-flex gap-2 justify-content-end">
                     @if (editingMemberIndex === i) {
-                      <button type="button" id="gmnc-member-save-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="saveEditMember(i)">
+                      <button type="button" id="gmnc-member-save-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" title="{{ i18n.buttons.save | translate }}" (click)="saveEditMember(i)">
                         <i nz-icon nzType="check"></i>
                       </button>
-                      <button type="button" id="gmnc-member-canceledit-{{i}}" class="btn btn-outline-secondary btn-icon btn-sm" (click)="cancelEditMember()">
+                      <button type="button" id="gmnc-member-canceledit-{{i}}" class="btn btn-outline-secondary btn-icon btn-sm" title="{{ i18n.buttons.cancel | translate }}" (click)="cancelEditMember()">
                         <i nz-icon nzType="close"></i>
                       </button>
                     } @else {
-                      <button type="button" id="gmnc-member-edit-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="startEditMember(i)">
+                      <button type="button" id="gmnc-member-edit-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" title="{{ i18n.buttons.edit | translate }}" (click)="startEditMember(i)">
                         <i nz-icon nzType="edit"></i>
                       </button>
-                      <button type="button" id="gmnc-member-remove-{{i}}" class="btn btn-outline-danger btn-icon btn-sm" (click)="removeMember(row)">
+                      <button type="button" id="gmnc-member-remove-{{i}}" class="btn btn-outline-danger btn-icon btn-sm" title="{{ i18n.buttons.delete | translate }}" (click)="removeMember(row)">
                         <i nz-icon nzType="delete"></i>
                       </button>
                     }
@@ -105,6 +113,11 @@
           }
         </tbody>
       </table>
+    </div>
+  } @else {
+    <div class="d-flex align-items-center gap-2 text-muted border rounded-3 px-4 py-3 mb-5">
+      <i nz-icon nzType="team"></i>
+      <span>{{ 'pages.group.detail.memberRole.empty' | translate }}</span>
     </div>
   }
 

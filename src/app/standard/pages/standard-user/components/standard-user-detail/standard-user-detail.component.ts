@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { IUser, IUserGroupRole, StandardUserForm } from '../../models/standard-user.model';
 import { StandardFormComponent } from '../../../../shared/abstracts/components/standard-form/standard-form.component';
 import { StandardUserService } from '../../services/standard-user.service';
@@ -26,6 +27,7 @@ type GroupRoleEntryRow = FormGroup<{ gid: FormControl<string | null>; roleId: Fo
   selector: 'app-standard-user-detail',
   standalone: true,
   imports: [
+    CommonModule,
     NzGridModule,
     NzCardModule,
     NzIconModule,

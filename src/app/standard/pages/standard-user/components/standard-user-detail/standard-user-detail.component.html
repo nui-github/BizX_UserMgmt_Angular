@@ -6,51 +6,73 @@
   <p class="card-subtitle mb-4">{{ groupRoleSubtitle | translate }}</p>
 
   @if (assignedGroupRoles.length) {
-    <div class="d-flex flex-column gap-2 mb-5">
-      @for (item of assignedGroupRoles; track item.gid + '-' + item.roleId) {
-        <div class="d-flex align-items-center justify-content-between gap-3 px-4 py-3 border rounded-2 bg-body-tertiary">
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <span class="badge bg-primary-subtle text-primary rounded-pill fw-normal">{{ 'pages.user.detail.select.gid.label' | translate }}</span>
-            @if (editingAssignmentIndex === $index) {
-              <span id="umnc-grouprole-group-{{$index}}" class="fw-semibold text-muted" title="{{ 'pages.user.detail.groupRole.group.locked' | translate }}">
-                {{ groupName(item.gid) }}
-                <i nz-icon nzType="lock" class="ms-1"></i>
-              </span>
-            } @else {
-              <span id="umnc-grouprole-group-{{$index}}" class="fw-semibold">{{ groupName(item.gid) }}</span>
+    <div class="table-responsive mb-5 border rounded-3">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr class="text-uppercase text-muted small">
+            <th class="border-0 ps-4">{{ 'pages.user.detail.groupRole.table.group' | translate }}</th>
+            <th class="border-0">{{ 'pages.user.detail.groupRole.table.role' | translate }}</th>
+            <th class="border-0">{{ 'pages.user.detail.groupRole.table.addedAt' | translate }}</th>
+            @if (hasPermissions) {
+              <th class="border-0 text-end text-nowrap pe-4">{{ 'pages.user.detail.groupRole.table.action' | translate }}</th>
             }
-            <span class="badge bg-info-subtle text-info rounded-pill fw-normal ms-2">{{ 'pages.user.detail.groupRole.role.label' | translate }}</span>
-            @if (editingAssignmentIndex === $index) {
-              <nz-select [(ngModel)]="editRoleId" [ngModelOptions]="{standalone: true}" nzSize="small" class="form-control" [nzBorderless]="true">
-                @for (r of allRoles; track r.id) {
-                  <nz-option [nzValue]="r.id" [nzLabel]="r.name"></nz-option>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of assignedGroupRoles; track item.gid + '-' + item.roleId; let i = $index) {
+            <tr>
+              <td class="ps-4">
+                @if (editingAssignmentIndex === i) {
+                  <span id="umnc-grouprole-group-{{i}}" class="fw-semibold text-muted" title="{{ 'pages.user.detail.groupRole.group.locked' | translate }}">
+                    {{ groupName(item.gid) }}
+                    <i nz-icon nzType="lock" class="ms-1"></i>
+                  </span>
+                } @else {
+                  <span id="umnc-grouprole-group-{{i}}" class="fw-semibold">{{ groupName(item.gid) }}</span>
                 }
-              </nz-select>
-            } @else {
-              <span id="umnc-grouprole-role-{{$index}}">{{ roleName(item.roleId) }}</span>
-            }
-          </div>
-          @if (hasPermissions) {
-            <div class="d-flex gap-2">
-              @if (editingAssignmentIndex === $index) {
-                <button type="button" id="umnc-grouprole-save-{{$index}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="saveEditAssignment($index)">
-                  <i nz-icon nzType="check"></i>
-                </button>
-                <button type="button" id="umnc-grouprole-canceledit-{{$index}}" class="btn btn-outline-secondary btn-icon btn-sm" (click)="cancelEditAssignment()">
-                  <i nz-icon nzType="close"></i>
-                </button>
-              } @else {
-                <button type="button" id="umnc-grouprole-edit-{{$index}}" class="btn btn-outline-primary btn-icon btn-sm" (click)="startEditAssignment($index)">
-                  <i nz-icon nzType="edit"></i>
-                </button>
-                <button type="button" id="umnc-grouprole-remove-{{$index}}" class="btn btn-outline-danger btn-icon btn-sm" (click)="removeAssignment($index)">
-                  <i nz-icon nzType="delete"></i>
-                </button>
+              </td>
+              <td id="umnc-grouprole-role-{{i}}">
+                @if (editingAssignmentIndex === i) {
+                  <nz-select [(ngModel)]="editRoleId" [ngModelOptions]="{standalone: true}" nzSize="small" class="form-control" [nzBorderless]="true">
+                    @for (r of allRoles; track r.id) {
+                      <nz-option [nzValue]="r.id" [nzLabel]="r.name"></nz-option>
+                    }
+                  </nz-select>
+                } @else {
+                  <span class="badge bg-info-subtle text-info rounded-pill fw-normal">{{ roleName(item.roleId) }}</span>
+                }
+              </td>
+              <td class="text-muted small text-nowrap">{{ item.addedAt ? (item.addedAt | date: 'yyyy-MM-dd H:mm') : '-' }}</td>
+              @if (hasPermissions) {
+                <td class="text-end text-nowrap pe-4">
+                  <div class="d-flex gap-2 justify-content-end">
+                    @if (editingAssignmentIndex === i) {
+                      <button type="button" id="umnc-grouprole-save-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" title="{{ i18n.buttons.save | translate }}" (click)="saveEditAssignment(i)">
+                        <i nz-icon nzType="check"></i>
+                      </button>
+                      <button type="button" id="umnc-grouprole-canceledit-{{i}}" class="btn btn-outline-secondary btn-icon btn-sm" title="{{ i18n.buttons.cancel | translate }}" (click)="cancelEditAssignment()">
+                        <i nz-icon nzType="close"></i>
+                      </button>
+                    } @else {
+                      <button type="button" id="umnc-grouprole-edit-{{i}}" class="btn btn-outline-primary btn-icon btn-sm" title="{{ i18n.buttons.edit | translate }}" (click)="startEditAssignment(i)">
+                        <i nz-icon nzType="edit"></i>
+                      </button>
+                      <button type="button" id="umnc-grouprole-remove-{{i}}" class="btn btn-outline-danger btn-icon btn-sm" title="{{ i18n.buttons.delete | translate }}" (click)="removeAssignment(i)">
+                        <i nz-icon nzType="delete"></i>
+                      </button>
+                    }
+                  </div>
+                </td>
               }
-            </div>
+            </tr>
           }
-        </div>
-      }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div class="d-flex align-items-center gap-2 text-muted border rounded-3 px-4 py-3 mb-5">
+      <i nz-icon nzType="team"></i>
+      <span>{{ 'pages.user.detail.groupRole.empty' | translate }}</span>
     </div>
   }
 
