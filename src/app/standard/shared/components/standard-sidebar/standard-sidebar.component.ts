@@ -6,6 +6,7 @@ import { IMenu, MenuSearch } from "../../../pages/standard-menu/models/standard-
 import _ from "lodash";
 import { NzGridModule } from "ng-zorro-antd/grid";
 import { Observable } from "rxjs";
+import { StandardAppPermissionService } from "../../../core/services/standard-app-permission.service";
 
 @Component({
   selector: "app-sidebar",
@@ -23,9 +24,11 @@ export class StandardSidebarComponent implements OnInit {
   public showMenu: string = "";
   public menus: IMenu[] = [];
   public sidebarHover = false;
+  private readonly systemAdminOnlyMenus = ["Permission Management", "Menu Management", "Token Management", "Register Management"];
   constructor(
     private router: Router,
     private menuService: StandardMenuService,
+    private permissions: StandardAppPermissionService,
     public config: AppConfig,
   ) {}
 
@@ -58,6 +61,9 @@ export class StandardSidebarComponent implements OnInit {
   }
 
   groupMenu(menus: IMenu[]) {
+    if (!this.permissions.checkIsSystemAdmin()) {
+      menus = menus.filter((m) => !this.systemAdminOnlyMenus.includes(m.name ?? ""));
+    }
     let menuItems: IMenu[] = menus.filter(
       (m) =>
         !m.isSubMenu &&
