@@ -455,6 +455,10 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     return this.allRoles.find(r => r.id === roleId)?.name ?? String(roleId);
   }
 
+  isUserAssigned(uid: string | undefined): boolean {
+    return this.groupMembers.some(m => m.uid === uid);
+  }
+
   addMember() {
     const uid = this.memberEntryForm.controls.uid.value;
     const roleId = this.memberEntryForm.controls.roleId.value;
@@ -468,7 +472,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     }
 
     if (this.pageType === "add") {
-      if (this.pendingMembers.some(pm => pm.uid === uid && pm.roleId === roleId)) {
+      if (this.pendingMembers.some(pm => pm.uid === uid)) {
         this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
         return;
       }
@@ -479,7 +483,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     }
 
     const existing = user.groupRoles ?? [];
-    if (existing.some(gr => gr.gid === this.id && gr.roleId === roleId)) {
+    if (existing.some(gr => gr.gid === this.id)) {
       this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
       return;
     }
@@ -489,7 +493,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
 
   removeMember(row: GroupMemberRow) {
     if (this.pageType === "add") {
-      this.pendingMembers = this.pendingMembers.filter(pm => !(pm.uid === row.uid && pm.roleId === row.roleId));
+      this.pendingMembers = this.pendingMembers.filter(pm => pm.uid !== row.uid);
       this.refreshPendingRows();
       return;
     }
@@ -497,7 +501,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     if (!user) {
       return;
     }
-    const updated = (user.groupRoles ?? []).filter(gr => !(gr.gid === this.id && gr.roleId === row.roleId));
+    const updated = (user.groupRoles ?? []).filter(gr => gr.gid !== this.id);
     this.persistUserGroupRoles(user.uid, updated);
   }
 
@@ -520,11 +524,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
     const targetRoleId = this.editRoleId;
 
     if (this.pageType === "add") {
-      if (this.pendingMembers.some(pm => pm.uid === row.uid && pm.roleId === targetRoleId)) {
-        this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
-        return;
-      }
-      this.pendingMembers = this.pendingMembers.map(pm => (pm.uid === row.uid && pm.roleId === row.roleId) ? { ...pm, roleId: targetRoleId } : pm);
+      this.pendingMembers = this.pendingMembers.map(pm => pm.uid === row.uid ? { ...pm, roleId: targetRoleId } : pm);
       this.refreshPendingRows();
       this.cancelEditMember();
       return;
@@ -535,11 +535,7 @@ export class StandardGroupDetailComponent extends StandardFormComponent<Standard
       return;
     }
     const existing = user.groupRoles ?? [];
-    if (existing.some(gr => gr.gid === this.id && gr.roleId === targetRoleId)) {
-      this.alertService.alertDefaultError('pages.group.detail.memberRole.duplicate.error');
-      return;
-    }
-    const updated = existing.map(gr => (gr.gid === this.id && gr.roleId === row.roleId) ? { ...gr, roleId: targetRoleId } : gr);
+    const updated = existing.map(gr => gr.gid === this.id ? { ...gr, roleId: targetRoleId } : gr);
     this.persistUserGroupRoles(user.uid, updated, () => this.cancelEditMember());
   }
 

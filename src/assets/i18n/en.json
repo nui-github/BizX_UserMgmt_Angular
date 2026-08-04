@@ -384,7 +384,7 @@
   "pages.group.detail.memberRole.user.sublabel": "ผู้ใช้งาน",
   "pages.group.detail.memberRole.role.label": "Role",
   "pages.group.detail.memberRole.role.sublabel": "บทบาท",
-  "pages.group.detail.memberRole.duplicate.error": "This user already has this role in the group",
+  "pages.group.detail.memberRole.duplicate.error": "This user is already assigned to this group",
   "pages.group.detail.memberRole.table.addedAt": "Date Added",
   "pages.group.detail.memberRole.table.name": "Name",
   "pages.group.detail.memberRole.table.email": "Email",

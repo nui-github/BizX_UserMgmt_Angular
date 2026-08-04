@@ -385,7 +385,7 @@
   "pages.group.detail.memberRole.user.sublabel": "User",
   "pages.group.detail.memberRole.role.label": "บทบาท",
   "pages.group.detail.memberRole.role.sublabel": "Role",
-  "pages.group.detail.memberRole.duplicate.error": "ผู้ใช้นี้มีบทบาทนี้ในกลุ่มอยู่แล้ว",
+  "pages.group.detail.memberRole.duplicate.error": "ผู้ใช้นี้ถูกเพิ่มในกลุ่มนี้แล้ว",
   "pages.group.detail.memberRole.table.addedAt": "วันที่เพิ่ม",
   "pages.group.detail.memberRole.table.name": "ชื่อ",
   "pages.group.detail.memberRole.table.email": "อีเมล",

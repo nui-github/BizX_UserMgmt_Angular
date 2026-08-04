@@ -124,7 +124,7 @@
               <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
                 id="gmnc-member-uid" formControlName="uid" nzPlaceHolder="{{ 'fields.select' | translate }}">
                 @for (u of allUsers; track u.uid) {
-                  <nz-option [nzValue]="u.uid" [nzLabel]="u.firstName + ' ' + u.lastName + ' - ' + u.email"></nz-option>
+                  <nz-option [nzValue]="u.uid" [nzLabel]="u.firstName + ' ' + u.lastName + ' - ' + u.email" [nzDisabled]="isUserAssigned(u.uid)"></nz-option>
                 }
               </nz-select>
             </nz-form-control>
