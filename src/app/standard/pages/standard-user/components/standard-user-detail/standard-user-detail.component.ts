@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { IUser, IUserGroupRole, StandardUserForm } from '../../models/standard-user.model';
 import { StandardFormComponent } from '../../../../shared/abstracts/components/standard-form/standard-form.component';
 import { StandardUserService } from '../../services/standard-user.service';
-import { AbstractControlOptions, FormArray, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControlOptions, FormArray, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StandardFormCardComponent, StandardFormCardInputConfig } from '../../../../shared/components/standard-form-card/standard-form-card.component';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -31,6 +31,7 @@ type GroupRoleEntryRow = FormGroup<{ gid: FormControl<string | null>; roleId: Fo
     NzIconModule,
     NzSelectModule,
     NzFormModule,
+    FormsModule,
     ReactiveFormsModule,
     StandardFormCardComponent,
     TranslateModule
@@ -57,6 +58,8 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
   public entryRows: FormArray<GroupRoleEntryRow> = new FormArray<GroupRoleEntryRow>([]);
   public groupRoleTitle = "pages.user.detail.groupRole.title";
   public groupRoleSubtitle = "pages.user.detail.groupRole.subtitle";
+  public editingAssignmentIndex: number | null = null;
+  public editRoleId: number | null = null;
 
   public inputConfig: StandardFormCardInputConfig[] = [
     {
@@ -304,7 +307,7 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
       row.markAllAsTouched();
       return;
     }
-    if (this.assignedGroupRoles.some(a => a.gid === gid && a.roleId === roleId)) {
+    if (this.assignedGroupRoles.some(a => a.gid === gid)) {
       this.alertService.alertDefaultError('pages.user.detail.groupRole.duplicate.error');
       return;
     }
@@ -319,6 +322,28 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
   removeAssignment(index: number) {
     this.assignedGroupRoles = this.assignedGroupRoles.filter((_, i) => i !== index);
     this.syncGroupRolesControl();
+  }
+
+  startEditAssignment(index: number) {
+    this.editingAssignmentIndex = index;
+    this.editRoleId = this.assignedGroupRoles[index].roleId;
+  }
+
+  cancelEditAssignment() {
+    this.editingAssignmentIndex = null;
+    this.editRoleId = null;
+  }
+
+  saveEditAssignment(index: number) {
+    if (!this.editRoleId) {
+      return;
+    }
+    this.assignedGroupRoles = this.assignedGroupRoles.map((a, i) =>
+      i === index ? { ...a, roleId: this.editRoleId! } : a
+    );
+    this.syncGroupRolesControl();
+    this.editingAssignmentIndex = null;
+    this.editRoleId = null;
   }
 
   syncGroupRolesControl() {
