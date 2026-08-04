@@ -71,7 +71,7 @@
               <nz-select nzShowSearch nzAllowClear class="form-control" nzSize="default" [nzBorderless]="true"
                 id="umnc-grouprole-gid-{{$index}}" formControlName="gid" nzPlaceHolder="{{ 'fields.select' | translate }}">
                 @for (g of responseItemsGroup; track g.gid) {
-                  <nz-option [nzValue]="g.gid" [nzLabel]="g.name"></nz-option>
+                  <nz-option [nzValue]="g.gid" [nzLabel]="g.name" [nzDisabled]="isGroupAssigned(g.gid)"></nz-option>
                 }
               </nz-select>
             </nz-form-control>

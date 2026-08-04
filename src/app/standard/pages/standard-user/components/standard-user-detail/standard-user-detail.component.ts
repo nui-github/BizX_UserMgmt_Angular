@@ -359,6 +359,10 @@ export class StandardUserDetailComponent extends StandardFormComponent<IUser> {
     return this.allRoles.find(r => r.id === roleId)?.name ?? String(roleId);
   }
 
+  isGroupAssigned(gid: string | null | undefined): boolean {
+    return this.assignedGroupRoles.some(a => a.gid === gid);
+  }
+
   save(){
     this.formGroup.markAllAsTouched();
     this.formGroup.updateValueAndValidity();
