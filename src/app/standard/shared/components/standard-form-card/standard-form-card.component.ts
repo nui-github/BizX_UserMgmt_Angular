@@ -89,6 +89,21 @@ export class StandardFormCardComponent implements OnInit,AfterViewInit {
   constructor(private el: ElementRef) {
   }
   ngOnInit(): void {
+    for (const input of this.inputConfig) {
+      if (input.type !== 'checkboxInput') {
+        continue;
+      }
+      const control = this.formGroup.controls[input.formControlName];
+      const syncDisabled = (value: any) => {
+        if (value === -1 && control.enabled) {
+          control.disable({ emitEvent: false });
+        } else if (value !== -1 && control.disabled) {
+          control.enable({ emitEvent: false });
+        }
+      };
+      syncDisabled(control.value);
+      control.valueChanges.subscribe(syncDisabled);
+    }
   }
 
   getRows(): StandardFormCardInputConfig[][] {
