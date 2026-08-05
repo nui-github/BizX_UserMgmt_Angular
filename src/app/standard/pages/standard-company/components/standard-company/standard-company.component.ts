@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { StandardAppPermissionService } from '../../../../core/services/standard-app-permission.service';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { StandardCardComponent } from '../../../../shared/components/standard-card/standard-card.component';
@@ -29,9 +29,16 @@ export class StandardCompanyComponent {
   public permissions: StandardAppPermissionService = inject(StandardAppPermissionService);
   public i18n: i18n = new i18n();
 
-  constructor(private activatedRoute: ActivatedRoute) {
+  constructor(private activatedRoute: ActivatedRoute, private router: Router) {
     this.activatedRoute.data.subscribe(data => {
       this.pageType = data['state'];
+      if (!this.pageType && !this.permissions.checkIsSystemAdmin()) {
+        // Company admin only ever manages their own company — skip straight to its edit page.
+        const currentUser = JSON.parse(sessionStorage.getItem('currentUser') ?? '{}');
+        if (currentUser.cpid) {
+          this.router.navigate(['/mainmenu/company/edit', currentUser.cpid], { replaceUrl: true });
+        }
+      }
     });
   }
 }
