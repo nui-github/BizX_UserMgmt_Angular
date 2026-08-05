@@ -6,10 +6,10 @@
   <p class="card-subtitle mb-4">{{ groupRoleSubtitle | translate }}</p>
 
   @if (assignedGroupRoles.length) {
-    <div class="table-responsive mb-5 border rounded-3">
+    <div class="table-responsive mb-5 border rounded-3 overflow-hidden">
       <table class="table table-hover align-middle mb-0">
         <thead>
-          <tr class="text-uppercase text-muted small">
+          <tr class="text-uppercase text-muted small" style="--bs-table-bg: #e9ecef;">
             <th class="border-0 ps-4">{{ 'pages.user.detail.groupRole.table.group' | translate }}</th>
             <th class="border-0">{{ 'pages.user.detail.groupRole.table.role' | translate }}</th>
             <th class="border-0">{{ 'pages.user.detail.groupRole.table.addedAt' | translate }}</th>

@@ -50,10 +50,10 @@
   <p class="card-subtitle mb-4">{{ groupMemberSubtitle | translate }}</p>
 
   @if (groupMembers.length) {
-    <div class="table-responsive mb-5 border rounded-3">
+    <div class="table-responsive mb-5 border rounded-3 overflow-hidden">
       <table class="table table-hover align-middle mb-0">
         <thead>
-          <tr class="text-uppercase text-muted small">
+          <tr class="text-uppercase text-muted small" style="--bs-table-bg: #e9ecef;">
             <th class="border-0 ps-4">{{ 'pages.group.detail.memberRole.table.name' | translate }}</th>
             <th class="border-0">{{ 'pages.group.detail.memberRole.table.role' | translate }}</th>
             <th class="border-0">{{ 'pages.group.detail.memberRole.table.addedAt' | translate }}</th>
